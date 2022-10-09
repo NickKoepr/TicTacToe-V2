@@ -32,17 +32,21 @@ def has_open_request(inviter_id: int):
 def try_accepting_request(invited_id: int, message_id: int):
     decline_requests = []
     if invited_id in invited_users.keys():
+        # Get all the invites that the user received (invited_id)
         all_invites = invited_users[invited_id]
         for invite in all_invites:
             if invite.message_id == message_id:
+                # Add all the invites to decline_requests, but without the accepted invite.
                 decline_requests = all_invites
                 decline_requests.remove(invite)
+                # Go over all the requests, and take the inviter_id. Then remove all the inviters out of the
+                # inviter dict.
                 for decline_request in decline_requests:
                     inviter_users.pop(decline_request.inviter_id)
                 inviter_id = invite.inviter_id
-
                 invited_users.pop(invited_id)
 
+                # Check if the invited person has sent a game request to a player.
                 if invited_id in inviter_users:
                     for inv in invited_users[inviter_users[invited_id].invited_id]:
                         if inv.inviter_id == invited_id:
