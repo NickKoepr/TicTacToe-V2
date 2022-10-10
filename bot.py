@@ -1,6 +1,6 @@
 import discord
 from discord import app_commands
-from commands.help_command import get_help_embed
+from bot.commands.help_command import get_help_embed
 
 intents = discord.Intents.default()
 
