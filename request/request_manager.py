@@ -1,5 +1,4 @@
-from request import Request
-
+from request.request import Request
 invited_users = dict()
 inviter_users = dict()
 
@@ -21,7 +20,6 @@ def create_invite(invited_id: int, inviter_id: int, message_id: int):
         invited_users[invited_id] = [request]
 
     inviter_users[inviter_id] = request
-
 
 def has_open_request(inviter_id: int):
     if inviter_id in inviter_users.keys():

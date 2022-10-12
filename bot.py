@@ -1,6 +1,7 @@
-import discord
 from discord import app_commands
-from bot.commands.help_command import get_help_embed
+from discordbot.commands.help_command import get_help_embed
+from discordbot.commands.start_command import *
+from request.request_manager import *
 
 intents = discord.Intents.default()
 
@@ -39,7 +40,14 @@ async def stop_command(interaction: discord.Interaction):
               description='Play a match of tic tac toe!')
 @app_commands.describe(opponent='Choose a Discord member you want to play against.')
 async def start_command(interaction: discord.Interaction, opponent: discord.Member):
-    await interaction.response.send_message(f'test: {opponent.name}')
+    if not has_sent_an_invite(interaction.user.id):
+        await interaction.response.defer(thinking=True)
+        message = await interaction.followup.send(embed=get_request_embed(opponent.name, interaction.user.name),
+                                                  view=start_buttons_view())
+
+        create_invite(opponent.id, interaction.user.id, message.id)
+    else:
+        await interaction.response.send_message(embed=get_already_invite_embed())
 
 
 client.run(token)
