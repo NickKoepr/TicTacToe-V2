@@ -40,14 +40,23 @@ async def stop_command(interaction: discord.Interaction):
               description='Play a match of tic tac toe!')
 @app_commands.describe(opponent='Choose a Discord member you want to play against.')
 async def start_command(interaction: discord.Interaction, opponent: discord.Member):
-    if not has_sent_an_invite(interaction.user.id):
-        await interaction.response.defer(thinking=True)
-        message = await interaction.followup.send(embed=get_request_embed(opponent.name, interaction.user.name),
-                                                  view=start_buttons_view())
+    await interaction.response.defer(thinking=True)
 
-        create_invite(opponent.id, interaction.user.id, message.id)
-    else:
-        await interaction.response.send_message(embed=get_already_invite_embed())
+    if opponent.bot:
+        await interaction.followup.send(embed=get_invite_bot_embed())
+        return
+
+    if interaction.user.id == opponent.id:
+        await interaction.followup.send(embed=get_invited_self_embed())
+        return
+
+    if has_sent_an_invite(interaction.user.id):
+        await interaction.followup.send(embed=get_already_invite_embed())
+        return
+
+    message = await interaction.followup.send(embed=get_request_embed(opponent.name, interaction.user.name),
+                                              view=start_buttons_view())
+    create_invite(opponent.id, interaction.user.id, message.id)
 
 
 client.run(token)

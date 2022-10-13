@@ -20,6 +20,24 @@ def get_already_invite_embed():
     return embed
 
 
+def get_invite_bot_embed():
+    embed = discord.Embed(
+        title='Invalid user',
+        description='You cannot play TicTacToe with a bot!',
+        color=colors.error_color
+    )
+    return embed
+
+
+def get_invited_self_embed():
+    embed = discord.Embed(
+        title='Invalid user',
+        description='You cannot play TicTacToe with yourself :(',
+        color=colors.error_color
+    )
+    return embed
+
+
 class start_buttons_view(discord.ui.View):
     def __init__(self):
         super().__init__()
