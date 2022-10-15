@@ -3,17 +3,37 @@ from request.request import Request
 invited_users = dict()
 inviter_users = dict()
 
+# TEST CODE - IGNORE!
+# from dataclasses import dataclass
+#
+#
+# @dataclass
+# class Request:
+#     invited_name: str
+#     inviter_name: str
+#     invited_id: int
+#     inviter_id: int
+#     message_id: int
+#     channel_id: int
 
-def create_invite(invited_id: int, inviter_id: int, message_id: int):
+def get_stats():
+    print(f'INVITED USERS:{invited_users}')
+    print(f'INVITER USERS:{inviter_users}')
+
+def create_invite(invited_name: str, inviter_name: str, invited_id: int, inviter_id: int, message_id: int,
+                  channel_id: int):
     """
     Send an invitation to a user for a game.
 
+    :param inviter_name: The name of the inviter.
+    :param invited_name: The name of the person that's invited.
     :param invited_id: The user ID of the invited member.
     :param inviter_id: The user ID of the inviter.
     :param message_id: The message ID of the message.
+    :param channel_id: The channel ID of the channel.
     """
 
-    request = Request(invited_id, inviter_id, message_id)
+    request = Request(invited_name, inviter_name, invited_id, inviter_id, message_id, channel_id)
 
     if invited_id in invited_users.keys():
         invited_users[invited_id].append(request)
@@ -79,7 +99,29 @@ def try_accepting_request(invited_id: int, message_id: int):
                         inviter_users.pop(inviter_invite.inviter_id)
                     invited_users.pop(inviter_id)
 
-            return [invite, decline_requests]
+                return [invite, decline_requests]
+    return False
+
+
+def decline_request(invited_id: int, message_id: int):
+    """
+    Decline a request because of the invited member.
+
+    :param invited_id: The user ID of the invited message.
+    :param message_id: The message ID.
+    :return: True if the invited is cancelled, otherwise False.
+    """
+
+    if invited_id in invited_users.keys():
+        invites = invited_users[invited_id]
+        for request in invites:
+            if request.message_id == message_id and request.invited_id == invited_id:
+                if len(invited_users[invited_id]) == 1:
+                    invited_users.pop(invited_id)
+                else:
+                    invited_users[invited_id].remove(request)
+                inviter_users.pop(request.inviter_id)
+                return True
     return False
 
 
@@ -94,3 +136,19 @@ def has_sent_an_invite(inviter_id: int):
         return True
     else:
         return False
+
+# TEST CODE - IGNORE!
+# create_invite('t', 't', 123, 456, 3049, 4049)
+# create_invite('t', 't', 456, 123, 30449, 4049)
+# create_invite('t', 't', 123, 888, 30649, 4049)
+# create_invite('t', 't', 123, 455, 30479, 4049)
+# create_invite('t', 't', 123, 846, 30749, 4049)
+# create_invite('t', 't', 456, 595, 5555, 4049)
+# create_invite('t', 't', 456, 596, 6666, 4049)
+# create_invite('t', 't', 456, 597, 9985, 4049)
+# create_invite('t', 't', 480, 598, 55848, 4049)
+# print(invited_users)
+# print(inviter_users)
+# print(try_accepting_request(456, 30449))
+# print(invited_users)
+# print(inviter_users)
