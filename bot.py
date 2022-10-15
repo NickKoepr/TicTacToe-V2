@@ -56,7 +56,8 @@ async def start_command(interaction: discord.Interaction, opponent: discord.Memb
 
     message = await interaction.followup.send(embed=get_request_embed(opponent.name, interaction.user.name),
                                               view=start_buttons_view())
-    create_invite(opponent.id, interaction.user.id, message.id)
+    create_invite(opponent.name, interaction.user.name, opponent.id, interaction.user.id, message.id,
+                  interaction.channel_id)
 
 
 client.run(token)
