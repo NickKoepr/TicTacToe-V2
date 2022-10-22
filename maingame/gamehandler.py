@@ -1,39 +1,39 @@
 from player import Player
 
 
-def update_board(player: Player, pos: int, game_layout: list):
+def update_board(player: Player, pos: int, board: list):
     """
-    Update the game layout with the move of the player.
+    Update the maingame layout with the move of the player.
 
     :param player: The player number that's placing.
     :param pos: The selected position.
-    :param game_layout: The current game layout.
-    :return: updated game after move (list)
+    :param board: The current game board.
+    :return: updated maingame after move (list)
     """
-    game_layout[pos] = player
+    board[pos] = player
 
 
-def is_available(pos: int, game_layout: list):
+def is_available(pos: int, board: list):
     """
     Checks is the given location is available.
 
     :param row: The chosen row.
     :param pos: The chosen position in the given row.
-    :param game_layout: The current game layout.
+    :param board: The current game board.
     :return: True or False
     """
-    if game_layout[pos] == Player.NOTHING:
+    if board[pos] == Player.NOTHING:
         return True
     else:
         return False
 
 
-def player_has_won(game_layout):
+def player_has_won(board):
     """
     Checks if a player has won.
 
-    :param game_layout: The current game layout.
-    :return: The Player when someone has won the game, otherwise
+    :param board: The current game board.
+    :return: The Player when someone has won the maingame, otherwise
     """
 
     possible_combinations = [[0, 1, 2],
@@ -46,13 +46,13 @@ def player_has_won(game_layout):
                              [2, 4, 6]]
 
     for combination in possible_combinations:
-        if game_layout[combination[0]] == Player.PLAYER_O and game_layout[combination[1]] == Player.PLAYER_O and \
-                game_layout[combination[2]] \
+        if board[combination[0]] == Player.PLAYER_O and board[combination[1]] == Player.PLAYER_O and \
+                board[combination[2]] \
                 == Player.PLAYER_O:
             return Player.PLAYER_O
 
-        if game_layout[combination[0]] == Player.PLAYER_X and game_layout[combination[1]] == Player.PLAYER_X and \
-                game_layout[combination[2]] \
+        if board[combination[0]] == Player.PLAYER_X and board[combination[1]] == Player.PLAYER_X and \
+                board[combination[2]] \
                 == Player.PLAYER_X:
             return Player.PLAYER_X
 

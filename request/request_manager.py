@@ -26,7 +26,7 @@ def get_stats():
 def create_invite(invited_name: str, inviter_name: str, invited_id: int, inviter_id: int, message_id: int,
                   channel_id: int):
     """
-    Send an invitation to a user for a game.
+    Send an invitation to a user for a maingame.
 
     :param inviter_name: The name of the inviter.
     :param invited_name: The name of the person that's invited.
@@ -78,7 +78,7 @@ def try_accepting_request(invited_id: int, message_id: int):
                 inviter_id = invite.inviter_id
                 invited_users.pop(invited_id)
 
-                # Check if the invited person has sent a game request to a player.
+                # Check if the invited person has sent a maingame request to a player.
                 if invited_id in inviter_users:
                     # Go over all invites and check if the invited id is equal to the inviter_id.
                     for inv in invited_users[inviter_users[invited_id].invited_id]:

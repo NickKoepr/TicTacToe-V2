@@ -9,6 +9,6 @@ def get_help_embed():
                           timestamp=datetime.datetime.utcnow())
     embed.add_field(name='**__/start [username]__**', value='**Play a match of tic tac toe!**', inline=False)
     embed.add_field(name='**/help**', value='*Gives a list with commands that you can use.*')
-    embed.add_field(name='**/stop**', value='*Cancel a request or stop a running game.*')
+    embed.add_field(name='**/stop**', value='*Cancel a request or stop a running maingame.*')
 
     return embed

@@ -31,7 +31,7 @@ async def help_command(interaction: discord.Interaction):
     await interaction.response.send_message(embed=embed)
 
 
-@tree.command(guild=discord.Object(id=guildId), name='stop', description='Cancel a request or stop a running game.')
+@tree.command(guild=discord.Object(id=guildId), name='stop', description='Cancel a request or stop a running maingame.')
 async def stop_command(interaction: discord.Interaction):
     await interaction.response.send_message('test')
 

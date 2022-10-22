@@ -1,4 +1,4 @@
-from player import Player
+from maingame.player import Player
 
 
 def create_default_board():
