@@ -2,7 +2,6 @@ import discord
 
 from utils import utils
 from request.request_manager import *
-import time
 
 
 def get_request_embed(invited_name: str, inviter_name: str, ):
@@ -47,40 +46,37 @@ class start_buttons_view(discord.ui.View):
 
     @discord.ui.button(label='Accept', style=discord.ButtonStyle.success, custom_id='accept_match')
     async def accept(self, interaction: discord.Interaction, button: discord.ui.Button):
-        # get_stats()
+        get_stats()
         requests = try_accepting_request(interaction.user.id, interaction.message.id)
+        get_stats()
         if requests is not False:
             if utils.check_permissions(interaction.channel.permissions_for(interaction.guild.me)):
-                print('all permissions')
+                accepted_request = requests[0]
+                # This code only runs when the bot has the right permission.
+                await interaction.message.edit(content='goedemorgen', view=None, embed=None)
+                # Decline all these requests:
+                for request in requests[1]:
+                    embed = discord.Embed(
+                        title='TicTacToe request',
+                        description=f'*{request.inviter_name} declined the request.*',
+                        color=utils.error_color)
+                    channel = interaction.guild.get_channel(request.channel_id)
+                    if channel is not None:
+                        message = await channel.fetch_message(request.message_id)
+                        if message is not None:
+                            await message.edit(embed=embed, view=None)
             else:
-                print('NOT ALL PERMISSIOn')
-            accepted_request = requests[0]
-            # This code only runs when the bot has the right permission.
-            await interaction.message.edit(content='goedemorgen', view=None, embed=None)
-            # if interaction.message.embeds:
-            #     raise Exception("No embed permissions")
-            # Decline all these requests:
-            for request in requests[1]:
-                embed = discord.Embed(
-                    title='TicTacToe request',
-                    description=f'*{request.inviter_name} declined the request.*',
-                    color=utils.error_color)
-                channel = interaction.guild.get_channel(request.channel_id)
-                if channel is not None:
-                    message = await channel.fetch_message(request.message_id)
-                    if message is not None:
-                        await message.edit(embed=embed, view=None)
+                await interaction.message.edit(embed=utils.get_invalid_perms_embed(), view=None)
         await interaction.response.defer()
-        # get_stats()
 
     @discord.ui.button(label='Decline', style=discord.ButtonStyle.danger, custom_id='decline_match')
     async def decline(self, interaction: discord.Interaction, button: discord.ui.Button):
-        # get_stats()
+        get_stats()
         if decline_request(interaction.user.id, interaction.message.id):
+            get_stats()
             embed = discord.Embed(
                 title='TicTacToe request',
                 description=f'*{interaction.user.name} declined the request.*',
                 color=utils.error_color)
             await interaction.message.edit(embed=embed, view=None)
         await interaction.response.defer()
-        # get_stats()

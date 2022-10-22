@@ -3,6 +3,7 @@ from request.request import Request
 invited_users = dict()
 inviter_users = dict()
 
+
 # TEST CODE - IGNORE!
 # from dataclasses import dataclass
 #
@@ -16,9 +17,11 @@ inviter_users = dict()
 #     message_id: int
 #     channel_id: int
 
+# TEST CODE - IGNORE!
 def get_stats():
     print(f'INVITED USERS:{invited_users}')
     print(f'INVITER USERS:{inviter_users}')
+
 
 def create_invite(invited_name: str, inviter_name: str, invited_id: int, inviter_id: int, message_id: int,
                   channel_id: int):

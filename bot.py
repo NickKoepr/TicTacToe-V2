@@ -42,6 +42,10 @@ async def stop_command(interaction: discord.Interaction):
 async def start_command(interaction: discord.Interaction, opponent: discord.Member):
     await interaction.response.defer(thinking=True)
 
+    if not utils.check_permissions(interaction.channel.permissions_for(interaction.guild.me)):
+        await interaction.followup.send(embed=utils.get_invalid_perms_embed())
+        return
+
     if opponent.bot:
         await interaction.followup.send(embed=get_invite_bot_embed())
         return
