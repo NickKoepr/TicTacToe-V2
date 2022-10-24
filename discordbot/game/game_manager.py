@@ -1,7 +1,7 @@
 import discord
 
 from discordbot.game.game_instance import GameInstance
-from utils.utils import embed_color
+from utils.utils import embed_color, x_icon, o_icon
 
 running_games = dict()
 
@@ -18,8 +18,8 @@ def create_board_embed(game_instance: GameInstance):
         turn_name = game_instance.playerO_name
     embed = discord.Embed(
         title='TicTacToe',
-        description=f'<:Xicon:1033418837728698459> = {game_instance.playerX_name}\n'
-                    f'<:Oicon:1033420163497852978> = {game_instance.playerO_name}\n\n'
+        description=f'{x_icon} = {game_instance.playerX_name}\n'
+                    f'{o_icon} = {game_instance.playerO_name}\n\n'
                     f'*{turn_name}\'s turn*',
         color=embed_color
     )

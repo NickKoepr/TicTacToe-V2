@@ -21,6 +21,7 @@ async def on_ready():
     print(f'Logged in as {client.user}!')
 
 
+
 with open('token.txt', 'r') as token_file:
     token = token_file.readline()
 

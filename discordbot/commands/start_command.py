@@ -1,7 +1,12 @@
 import discord
 
+from maingame.player import Player
 from utils import utils
 from request.request_manager import *
+from maingame import board
+from discordbot.game.game_instance import GameInstance
+from discordbot.game.game_manager import create_board_embed, create_running_game
+from discordbot.views import game_button_view
 
 
 def get_request_embed(invited_name: str, inviter_name: str, ):
@@ -53,7 +58,19 @@ class start_buttons_view(discord.ui.View):
             if utils.check_permissions(interaction.channel.permissions_for(interaction.guild.me)):
                 accepted_request = requests[0]
                 # This code only runs when the bot has the right permission.
-                await interaction.message.edit(content='goedemorgen', view=None, embed=None)
+                game_instance = GameInstance(
+                    playerX_id=accepted_request.invited_id,
+                    playerO_id=accepted_request.inviter_id,
+                    playerX_name=accepted_request.invited_name,
+                    playerO_name=accepted_request.inviter_name,
+                    board=board.create_default_board(),
+                    turn=Player.PLAYER_X,
+                    message_id=accepted_request.message_id,
+                    channel_id=accepted_request.channel_id
+                )
+                create_running_game(game_instance)
+                await interaction.message.edit(embed=create_board_embed(game_instance),
+                                               view=game_button_view(game_instance))
                 # Decline all these requests:
                 for request in requests[1]:
                     embed = discord.Embed(

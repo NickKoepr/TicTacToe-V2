@@ -2,7 +2,8 @@ import discord
 
 embed_color = discord.Color.from_rgb(64, 255, 255)
 error_color = discord.Color.from_rgb(255, 87, 51)
-
+x_icon = '<:Xicon:1033418837728698459>'
+o_icon = '<:Oicon:1033420163497852978>'
 
 def check_permissions(permissions: discord.Permissions):
     """Check if the bot has all the permissions.
