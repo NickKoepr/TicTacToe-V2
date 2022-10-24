@@ -1,4 +1,4 @@
-from player import Player
+from maingame.player import Player
 
 
 def update_board(player: Player, pos: int, board: list):
@@ -33,27 +33,17 @@ def player_has_won(board):
     Checks if a player has won.
 
     :param board: The current game board.
-    :return: The Player when someone has won the maingame, otherwise
+    :return: When someone wins the game, the player and the winning combination is returned, otherwise None.
     """
 
-    possible_combinations = [[0, 1, 2],
-                             [3, 4, 5],
-                             [6, 7, 8],
-                             [0, 3, 6],
-                             [1, 4, 7],
-                             [2, 5, 8],
-                             [0, 4, 8],
-                             [2, 4, 6]]
+    possible_combinations = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
 
     for combination in possible_combinations:
         if board[combination[0]] == Player.PLAYER_O and board[combination[1]] == Player.PLAYER_O and \
-                board[combination[2]] \
-                == Player.PLAYER_O:
-            return Player.PLAYER_O
+                board[combination[2]] == Player.PLAYER_O:
+            return [Player.PLAYER_O, combination]
 
         if board[combination[0]] == Player.PLAYER_X and board[combination[1]] == Player.PLAYER_X and \
-                board[combination[2]] \
-                == Player.PLAYER_X:
-            return Player.PLAYER_X
-
-        return None
+                board[combination[2]] == Player.PLAYER_X:
+            return [Player.PLAYER_X, combination]
+    return None

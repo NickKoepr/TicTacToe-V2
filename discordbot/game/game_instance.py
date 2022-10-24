@@ -12,3 +12,5 @@ class GameInstance:
     turn: Player
     message_id: int
     channel_id: int
+    finished: bool
+    finished_layout: list = None
