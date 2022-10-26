@@ -14,3 +14,4 @@ class GameInstance:
     channel_id: int
     finished: bool
     finished_layout: list = None
+    stopped: bool = False

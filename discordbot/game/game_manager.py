@@ -102,9 +102,40 @@ def accept_request(game_instance: GameInstance, user_id: int):
     if other_player in accepted_rematch:
         running_games.pop(game_instance.playerX_id)
         running_games.pop(game_instance.playerO_id)
+        accepted_rematch.remove(other_player)
         print(running_games)
         return True
         pass
     else:
         accepted_rematch.append(user_id)
         return create_win_embed(game_instance, plX, plO)
+
+
+def decline_request(game_instance: GameInstance, user_id: int):
+    if game_instance.playerO_id != user_id:
+        other_player = game_instance.playerO_id
+        player_name = game_instance.playerX_name
+        if other_player in accepted_rematch:
+            plO = True
+            accepted_rematch.remove(other_player)
+        else:
+            plO = None
+        plX = False
+    else:
+        other_player = game_instance.playerX_id
+        player_name = game_instance.playerO_name
+        plO = False
+        if other_player in accepted_rematch:
+            plX = True
+            accepted_rematch.remove(other_player)
+        else:
+            plX = None
+    running_games.pop(game_instance.playerO_id)
+    running_games.pop(game_instance.playerX_id)
+    winning_embed = create_win_embed(game_instance, plX, plO)
+    print(accepted_rematch)
+    print(running_games)
+    description = winning_embed.description
+    description += f'\n\n*{player_name} declined the rematch. Thanks for playing!*'
+    winning_embed.description = description
+    return winning_embed
