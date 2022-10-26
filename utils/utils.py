@@ -2,8 +2,10 @@ import discord
 
 embed_color = discord.Color.from_rgb(64, 255, 255)
 error_color = discord.Color.from_rgb(255, 87, 51)
+win_color = discord.Color.from_rgb(212, 175, 55)
 x_icon = '<:Xicon:1033418837728698459>'
 o_icon = '<:Oicon:1033420163497852978>'
+debug_enabled = True
 
 
 def check_permissions(permissions: discord.Permissions):
@@ -29,3 +31,8 @@ def get_invalid_perms_embed():
         description='I don\'t have all the permissions that I need to function!\n I need ' \
                     'the permissions `embed_links`, `read_message_history`, `send_messages`, `view_chanel`!'
     )
+
+
+def debug(msg):
+    if debug_enabled:
+        print(msg)
