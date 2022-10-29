@@ -141,6 +141,8 @@ def decline_request_inviter(inviter_id: int):
         else:
             invited_users[invited_id].remove(request)
         inviter_users.pop(inviter_id)
+        print(invited_users)
+        print(inviter_users)
         return True
     return False
 
