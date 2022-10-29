@@ -5,9 +5,9 @@ inviter_users = dict()
 
 
 # TEST CODE - IGNORE!
-# from dataclasses import dataclass
-#
-#
+from dataclasses import dataclass
+
+
 # @dataclass
 # class Request:
 #     invited_name: str
@@ -106,13 +106,12 @@ def try_accepting_request(invited_id: int, message_id: int):
     return False
 
 
-def decline_request(invited_id: int, message_id: int):
-    """
-    Decline a request because of the invited member.
+def decline_request_invited(invited_id: int, message_id: int):
+    """Decline a request based on the inviter id.
 
-    :param invited_id: The user ID of the invited message.
+    :param invited_id: The user ID of the invited member.
     :param message_id: The message ID.
-    :return: True if the invited is cancelled, otherwise False.
+    :return: True if the invite is cancelled, otherwise False.
     """
 
     if invited_id in invited_users.keys():
@@ -125,6 +124,24 @@ def decline_request(invited_id: int, message_id: int):
                     invited_users[invited_id].remove(request)
                 inviter_users.pop(request.inviter_id)
                 return True
+    return False
+
+
+def decline_request_inviter(inviter_id: int):
+    """Decline a request based on the inviter id.
+
+    :param inviter_id: The user ID of the inviter.
+    :return: True if the invite is cancelled, otherwise False.
+    """
+    if inviter_id in inviter_users.keys():
+        request = inviter_users[inviter_id]
+        invited_id = request.invited_id
+        if len(invited_users[invited_id]) == 1:
+            invited_users.pop(invited_id)
+        else:
+            invited_users[invited_id].remove(request)
+        inviter_users.pop(inviter_id)
+        return True
     return False
 
 
@@ -152,7 +169,7 @@ def has_sent_an_invite(inviter_id: int):
 # create_invite('h', 'h', 6, 11, 11, 1)
 # print(invited_users)
 # print(inviter_users)
-# print(try_accepting_request(1, 1))
-# print(try_accepting_request(3, 9))
+# print(decline_request_inviter(4))
+# print()
 # print(invited_users)
 # print(inviter_users)

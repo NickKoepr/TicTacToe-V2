@@ -3,6 +3,7 @@ import discord
 embed_color = discord.Color.from_rgb(64, 255, 255)
 error_color = discord.Color.from_rgb(255, 87, 51)
 win_color = discord.Color.from_rgb(212, 175, 55)
+green_color = discord.Color.from_rgb(50, 205, 50)
 x_icon = '<:Xicon:1033418837728698459>'
 o_icon = '<:Oicon:1033420163497852978>'
 debug_enabled = True

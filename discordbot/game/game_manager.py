@@ -8,6 +8,12 @@ running_games = dict()
 accepted_rematch = list()
 
 
+def has_running_game(user_id: int):
+    if user_id in running_games.keys():
+        return True
+    return False
+
+
 def create_running_game(game_instance: GameInstance):
     """Add a game instance to the running games list.
 
@@ -57,6 +63,15 @@ def player_turn(game_instance: GameInstance, pos: int):
 
 
 def create_win_embed(game_instance: GameInstance, playerX_accepted, playerO_accepted):
+    """Create the win embed if a game has a winner.
+
+    :param game_instance: The game instance.
+    :param playerX_accepted: True if the Player X has accepted a rematch,
+    otherwise False or None if this player hasn't made a decision yet.
+    :param playerO_accepted: True if the Player O has accepted a rematch,
+    otherwise False or None if this player hasn't made a decision yet.
+    :return: Embed
+    """
     if game_instance.turn == Player.PLAYER_X:
         win_name = game_instance.playerX_name
     else:
@@ -90,6 +105,16 @@ def create_win_embed(game_instance: GameInstance, playerX_accepted, playerO_acce
 
 
 def accept_request(game_instance: GameInstance, user_id: int):
+    """Accept a game rematch.
+
+    :param game_instance: The game instance.
+    :param user_id: The user ID of the user that clicked on the Accepted button.
+    :return: Win embed if the other player hasn't decided if he wants a rematch or not, Otherwise True.
+    """
+
+    # Set the clicked player to Accepted, and the other one to not selected.
+    # (There is a chance that the other player has already accepted a rematch, but the win embed will not show this,
+    # because of the new game embed)
     if game_instance.playerO_id != user_id:
         other_player = game_instance.playerO_id
         plO = None
@@ -99,6 +124,7 @@ def accept_request(game_instance: GameInstance, user_id: int):
         plO = True
         plX = None
 
+    # Remove the current running game and the other player from the accepted_rematch list.
     if other_player in accepted_rematch:
         running_games.pop(game_instance.playerX_id)
         running_games.pop(game_instance.playerO_id)
@@ -107,11 +133,18 @@ def accept_request(game_instance: GameInstance, user_id: int):
         return True
         pass
     else:
+        # Add the player to the accepted rematch list.
         accepted_rematch.append(user_id)
         return create_win_embed(game_instance, plX, plO)
 
 
 def decline_request(game_instance: GameInstance, user_id: int):
+    """Decline a game rematch.
+
+    :param game_instance: The game instance.
+    :param user_id: The user ID of the user that clicked on the Decline button.
+    :return: the updated winning embed.
+    """
     if game_instance.playerO_id != user_id:
         other_player = game_instance.playerO_id
         player_name = game_instance.playerX_name
@@ -130,6 +163,10 @@ def decline_request(game_instance: GameInstance, user_id: int):
             accepted_rematch.remove(other_player)
         else:
             plX = None
+
+    if user_id in accepted_rematch:
+        accepted_rematch.remove(user_id)
+
     running_games.pop(game_instance.playerO_id)
     running_games.pop(game_instance.playerX_id)
     winning_embed = create_win_embed(game_instance, plX, plO)

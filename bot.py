@@ -21,7 +21,6 @@ async def on_ready():
     print(f'Logged in as {client.user}!')
 
 
-
 with open('token.txt', 'r') as token_file:
     token = token_file.readline()
 
@@ -34,6 +33,7 @@ async def help_command(interaction: discord.Interaction):
 
 @tree.command(guild=discord.Object(id=guildId), name='stop', description='Cancel a request or stop a running maingame.')
 async def stop_command(interaction: discord.Interaction):
+
     await interaction.response.send_message('test')
 
 

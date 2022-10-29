@@ -45,6 +45,14 @@ def get_invited_self_embed():
     return embed
 
 
+def get_decline_request_embed(name: str):
+    embed = discord.Embed(
+        title='TicTacToe request',
+        description=f'*{name} declined the request.*',
+        color=utils.error_color)
+    return embed
+
+
 class start_buttons_view(discord.ui.View):
     def __init__(self):
         super().__init__()
@@ -74,10 +82,7 @@ class start_buttons_view(discord.ui.View):
                                                view=game_button_view(game_instance))
                 # Decline all these requests:
                 for request in requests[1]:
-                    embed = discord.Embed(
-                        title='TicTacToe request',
-                        description=f'*{request.inviter_name} declined the request.*',
-                        color=utils.error_color)
+                    embed = get_decline_request_embed(request.invited_name)
                     channel = interaction.guild.get_channel(request.channel_id)
                     if channel is not None:
                         message = await channel.fetch_message(request.message_id)
@@ -90,7 +95,7 @@ class start_buttons_view(discord.ui.View):
     @discord.ui.button(label='Decline', style=discord.ButtonStyle.danger, custom_id='decline_match')
     async def decline(self, interaction: discord.Interaction, button: discord.ui.Button):
         get_stats()
-        if decline_request(interaction.user.id, interaction.message.id):
+        if decline_request_invited(interaction.user.id, interaction.message.id):
             get_stats()
             embed = discord.Embed(
                 title='TicTacToe request',
