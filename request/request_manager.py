@@ -4,25 +4,6 @@ invited_users = dict()
 inviter_users = dict()
 
 
-# TEST CODE - IGNORE!
-from dataclasses import dataclass
-
-
-# @dataclass
-# class Request:
-#     invited_name: str
-#     inviter_name: str
-#     invited_id: int
-#     inviter_id: int
-#     message_id: int
-#     channel_id: int
-
-# TEST CODE - IGNORE!
-def get_stats():
-    print(f'INVITED USERS:{invited_users}')
-    print(f'INVITER USERS:{inviter_users}')
-
-
 def create_invite(invited_name: str, inviter_name: str, invited_id: int, inviter_id: int, message_id: int,
                   channel_id: int):
     """
@@ -158,20 +139,3 @@ def has_sent_an_invite(inviter_id: int):
         return True
     else:
         return False
-
-# TEST CODE - IGNORE!
-# create_invite('h', 'h', 1, 2, 1, 1)
-# create_invite('h', 'h', 2, 1, 2, 1)
-# create_invite('h', 'h', 2, 3, 3, 1)
-# create_invite('h', 'h', 1, 4, 4, 1)
-# create_invite('h', 'h', 1, 5, 5, 1)
-# create_invite('h', 'h', 3, 6, 9, 1)
-# create_invite('h', 'h', 3, 7, 8, 1)
-# create_invite('h', 'h', 6, 10, 10, 1)
-# create_invite('h', 'h', 6, 11, 11, 1)
-# print(invited_users)
-# print(inviter_users)
-# print(decline_request_inviter(4))
-# print()
-# print(invited_users)
-# print(inviter_users)
