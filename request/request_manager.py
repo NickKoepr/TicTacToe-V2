@@ -6,8 +6,7 @@ inviter_users = dict()
 
 def create_invite(invited_name: str, inviter_name: str, invited_id: int, inviter_id: int, message_id: int,
                   channel_id: int):
-    """
-    Send an invitation to a user for a maingame.
+    """Send an invitation to a user for a main game.
 
     :param inviter_name: The name of the inviter.
     :param invited_name: The name of the person that's invited.
@@ -34,8 +33,7 @@ def has_open_request(inviter_id: int):
 
 
 def try_accepting_request(invited_id: int, message_id: int):
-    """
-    Try accepting an invite request with the invited_id and the message_id.
+    """Try accepting an invite request with the invited_id and the message_id.
 
     :param invited_id: The user ID of the invited member.
     :param message_id: The message ID of the message.
@@ -129,8 +127,7 @@ def decline_request_inviter(inviter_id: int):
 
 
 def has_sent_an_invite(inviter_id: int):
-    """
-    Return False when the given member ID has an open invite request, otherwise return True.
+    """Return False when the given member ID has an open invite request, otherwise return True.
 
     :param inviter_id: The user ID of the inviter.
     :return: True or False

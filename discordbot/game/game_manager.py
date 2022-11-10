@@ -167,8 +167,12 @@ def decline_request(game_instance: GameInstance, user_id: int):
     if user_id in accepted_rematch:
         accepted_rematch.remove(user_id)
 
-    running_games.pop(game_instance.playerO_id)
-    running_games.pop(game_instance.playerX_id)
+    try:
+        running_games.pop(game_instance.playerO_id)
+        running_games.pop(game_instance.playerX_id)
+    except KeyError:
+        pass
+        
     winning_embed = create_win_embed(game_instance, plX, plO)
     print(accepted_rematch)
     print(running_games)

@@ -1,7 +1,9 @@
 from discord import app_commands
+
 from discordbot.commands.help_command import get_help_embed
 from discordbot.commands.start_command import *
 from discordbot.commands.stop_command import check_stop_command, get_nothing_cancel_embed
+from discordbot.views import game_button_view
 from request.request_manager import *
 
 intents = discord.Intents.default()
@@ -34,6 +36,7 @@ async def help_command(interaction: discord.Interaction):
 
 @tree.command(guild=discord.Object(id=guildId), name='stop', description='Cancel a request or stop a running maingame.')
 async def stop_command(interaction: discord.Interaction):
+    # Get the stop result if a user types the stop command.
     stop_result = check_stop_command(interaction.user.id)
     if not stop_result:
         await interaction.response.send_message(embed=get_nothing_cancel_embed())
@@ -44,9 +47,19 @@ async def stop_command(interaction: discord.Interaction):
         if channel is not None:
             try:
                 message = await channel.fetch_message(message_id)
+                if stop_result['stop_type'] in ['game', 'rematch']:
+                    game_instance = stop_result['game_instance']
+                    game_instance.stopped = True
+                    game_instance.finished = True
+                    if not game_instance.finished_layout:
+                        game_instance.finished_layout = []
+                    view = game_button_view(game_instance)
+                else:
+                    view = None
+
                 await message.edit(
                     embed=stop_result['decline_embed'],
-                    view=None
+                    view=view
                 )
             except discord.NotFound:
                 pass

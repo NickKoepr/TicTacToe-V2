@@ -59,9 +59,7 @@ class start_buttons_view(discord.ui.View):
 
     @discord.ui.button(label='Accept', style=discord.ButtonStyle.success, custom_id='accept_match')
     async def accept(self, interaction: discord.Interaction, button: discord.ui.Button):
-        get_stats()
         requests = try_accepting_request(interaction.user.id, interaction.message.id)
-        get_stats()
         if requests is not False:
             if utils.check_permissions(interaction.channel.permissions_for(interaction.guild.me)):
                 accepted_request = requests[0]
@@ -94,9 +92,7 @@ class start_buttons_view(discord.ui.View):
 
     @discord.ui.button(label='Decline', style=discord.ButtonStyle.danger, custom_id='decline_match')
     async def decline(self, interaction: discord.Interaction, button: discord.ui.Button):
-        get_stats()
         if decline_request_invited(interaction.user.id, interaction.message.id):
-            get_stats()
             embed = discord.Embed(
                 title='TicTacToe request',
                 description=f'*{interaction.user.name} declined the request.*',

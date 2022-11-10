@@ -15,12 +15,14 @@ def get_request_decline_embed(request: Request):
 
 
 def get_game_decline_embed(user_id: int, game_instance: GameInstance):
-    if user_id == game_instance.playerO_id:
-        username = game_instance.playerO_name
-        other_player = game_instance.playerX_name
-    else:
-        username = game_instance.playerX_name
-        other_player = game_instance.playerO_name
+    match user_id:
+        case game_instance.playerO_id:
+            username = game_instance.playerO_name
+            other_player = game_instance.playerX_name
+        case _:
+            username = game_instance.playerX_name
+            other_player = game_instance.playerO_name
+
     embed = discord.Embed(
         title='TicTacToe',
         description=
@@ -65,14 +67,13 @@ def check_stop_command(user_id: int):
     elif has_running_game(user_id):
         game_instance: GameInstance = running_games[user_id]
         if not game_instance.finished:
-            running_games.pop(game_instance.playerX_id)
-            running_games.pop(game_instance.playerO_id)
             return {
                 'stop_type': 'game',
                 'stop_embed': get_stop_embed('game'),
                 'message_id': game_instance.message_id,
                 'channel_id': game_instance.channel_id,
-                'decline_embed': get_game_decline_embed(user_id, game_instance)
+                'decline_embed': get_game_decline_embed(user_id, game_instance),
+                'game_instance': game_instance
             }
         else:
             return {
@@ -80,6 +81,7 @@ def check_stop_command(user_id: int):
                 'stop_embed': get_stop_embed('rematch'),
                 'message_id': game_instance.message_id,
                 'channel_id': game_instance.channel_id,
-                'decline_embed': decline_request(game_instance, user_id)
+                'decline_embed': decline_request(game_instance, user_id),
+                'game_instance': game_instance
             }
     return False
