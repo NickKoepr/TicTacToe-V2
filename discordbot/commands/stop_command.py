@@ -54,6 +54,11 @@ def get_nothing_cancel_embed():
 
 
 def check_stop_command(user_id: int):
+    """Check if a player has an open request, running game or an open rematch request.
+    :param user_id: The ID of the user.
+    :return: Dict with information if the user has an open request, running game or an open rematch request.
+    Otherwise, False.
+    """
     if has_open_request(user_id):
         request = inviter_users[user_id]
         decline_request_inviter(user_id)
@@ -67,6 +72,8 @@ def check_stop_command(user_id: int):
     elif has_running_game(user_id):
         game_instance: GameInstance = running_games[user_id]
         if not game_instance.finished:
+            running_games.pop(game_instance.playerO_id)
+            running_games.pop(game_instance.playerX_id)
             return {
                 'stop_type': 'game',
                 'stop_embed': get_stop_embed('game'),

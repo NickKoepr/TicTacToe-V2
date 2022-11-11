@@ -12,6 +12,6 @@ class GameInstance:
     turn: Player
     message_id: int
     channel_id: int
-    finished: bool
+    finished: bool = False
     finished_layout: list = None
     stopped: bool = False

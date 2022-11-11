@@ -5,6 +5,7 @@ from discordbot.commands.start_command import *
 from discordbot.commands.stop_command import check_stop_command, get_nothing_cancel_embed
 from discordbot.views import game_button_view
 from request.request_manager import *
+from discordbot.game.game_manager import has_running_game
 
 intents = discord.Intents.default()
 
@@ -36,6 +37,10 @@ async def help_command(interaction: discord.Interaction):
 
 @tree.command(guild=discord.Object(id=guildId), name='stop', description='Cancel a request or stop a running maingame.')
 async def stop_command(interaction: discord.Interaction):
+    if not utils.check_permissions(interaction.channel.permissions_for(interaction.guild.me)):
+        await interaction.followup.send(content=utils.get_invalid_perms_message())
+        return
+
     # Get the stop result if a user types the stop command.
     stop_result = check_stop_command(interaction.user.id)
     if not stop_result:
@@ -73,7 +78,7 @@ async def start_command(interaction: discord.Interaction, opponent: discord.Memb
     await interaction.response.defer(thinking=True)
 
     if not utils.check_permissions(interaction.channel.permissions_for(interaction.guild.me)):
-        await interaction.followup.send(embed=utils.get_invalid_perms_embed())
+        await interaction.followup.send(content=utils.get_invalid_perms_message())
         return
 
     if opponent.bot:
@@ -86,6 +91,14 @@ async def start_command(interaction: discord.Interaction, opponent: discord.Memb
 
     if has_sent_an_invite(interaction.user.id):
         await interaction.followup.send(embed=get_already_invite_embed())
+        return
+
+    if has_running_game(interaction.user.id):
+        await interaction.followup.send(embed=is_in_game(True))
+        return
+
+    if has_running_game(opponent.id):
+        await interaction.followup.send(embed=is_in_game(False, opponent_name=opponent.name))
         return
 
     message = await interaction.followup.send(embed=get_request_embed(opponent.name, interaction.user.name),

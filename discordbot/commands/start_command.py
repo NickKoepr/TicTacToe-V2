@@ -53,6 +53,21 @@ def get_decline_request_embed(name: str):
     return embed
 
 
+def is_in_game(himself: bool, opponent_name: str = 'NA'):
+    if himself:
+        title = 'You are currently in a running game!'
+        description = 'Type `/stop` to cancel your current request.'
+    else:
+        title = f'{opponent_name} is already in a game!'
+        description = 'You have to wait for this game to end!'
+    embed = discord.Embed(
+        title=title,
+        description=description,
+        color=utils.error_color
+    )
+    return embed
+
+
 class start_buttons_view(discord.ui.View):
     def __init__(self):
         super().__init__()
@@ -72,8 +87,7 @@ class start_buttons_view(discord.ui.View):
                     board=board.create_default_board(),
                     turn=Player.PLAYER_X,
                     message_id=accepted_request.message_id,
-                    channel_id=accepted_request.channel_id,
-                    finished=False
+                    channel_id=accepted_request.channel_id
                 )
                 create_running_game(game_instance)
                 await interaction.message.edit(embed=create_board_embed(game_instance),
@@ -87,7 +101,10 @@ class start_buttons_view(discord.ui.View):
                         if message is not None:
                             await message.edit(embed=embed, view=None)
             else:
-                await interaction.message.edit(embed=utils.get_invalid_perms_embed(), view=None)
+                try:
+                    await interaction.message.edit(content=utils.get_invalid_perms_message(), view=None, embed=None)
+                except discord.errors.Forbidden:
+                    pass
         await interaction.response.defer()
 
     @discord.ui.button(label='Decline', style=discord.ButtonStyle.danger, custom_id='decline_match')

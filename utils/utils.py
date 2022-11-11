@@ -21,17 +21,17 @@ def check_permissions(permissions: discord.Permissions):
     return False
 
 
-def get_invalid_perms_embed():
-    """Get invalid perms embed.
+def get_invalid_perms_message():
+    """Get invalid perms message.
 
-    :return: Embed.
+    :return: String.
     """
-    return discord.Embed(
-        title='Invalid permissions!',
-        color=discord.Color.red(),
-        description='I don\'t have all the permissions that I need to function!\n I need ' \
-                    'the permissions `embed_links`, `read_message_history`, `send_messages`, `view_chanel`!'
-    )
+    return "**__I don't have the right permissions!__**\n" \
+           "Please give me the permissions `embed_links`, `read_message_history`, " \
+           "`send_messages` and `view_channel`\n" \
+           "Otherwise I will not work!\n" \
+           "*(please note that the bot also needs these permissions on this channel!)*"
+
 
 
 def debug(msg):
