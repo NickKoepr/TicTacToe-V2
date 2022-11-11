@@ -41,7 +41,6 @@ def try_accepting_request(invited_id: int, message_id: int):
     element and a list with declined requests as a second element.
     """
 
-    decline_requests = []
     if invited_id in invited_users.keys():
         # Get all the invites that the user received (invited_id)
         all_invites = invited_users[invited_id]

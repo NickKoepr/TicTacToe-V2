@@ -37,8 +37,9 @@ class game_button(discord.ui.Button):
         pos = int(interaction.data['custom_id'])
         if game_instance.turn == Player.PLAYER_X and interaction.user.id == player_x \
                 or game_instance.turn == Player.PLAYER_O and interaction.user.id == player_o:
-            if not game_instance.finished and \
-                    utils.check_permissions(interaction.channel.permissions_for(interaction.guild.me)):
+            if not game_instance.stopped and \
+                    utils.check_permissions(interaction.channel.permissions_for(interaction.guild.me),
+                                            interaction.channel):
                 if is_available(pos, game_instance.board):
                     player_turn(game_instance, pos)
                     if game_instance.finished:
@@ -48,11 +49,15 @@ class game_button(discord.ui.Button):
                     await interaction.message.edit(embed=embed,
                                                    view=game_button_view(game_instance))
             else:
-                game_instance.finished = True
-                running_games.pop(game_instance.playerX_id)
-                running_games.pop(game_instance.playerO_id)
+                game_instance.stopped = True
                 try:
-                    await interaction.message.edit(content=utils.get_invalid_perms_message(), view=None, embed=None)
+                    running_games.pop(game_instance.playerX_id)
+                    running_games.pop(game_instance.playerO_id)
+                except KeyError:
+                    pass
+                try:
+                    await interaction.message.edit(content=utils.get_invalid_perms_message(
+                        interaction.channel), view=None, embed=None)
                 except discord.errors.Forbidden:
                     pass
         await interaction.response.defer()
@@ -68,8 +73,9 @@ class request_button(discord.ui.Button):
     async def callback(self, interaction: discord.Interaction):
         game_instance = self.game_instance
         if game_instance.playerO_id == interaction.user.id or game_instance.playerX_id == interaction.user.id:
-            if not game_instance.finished and \
-                    utils.check_permissions(interaction.channel.permissions_for(interaction.guild.me)):
+            if not game_instance.stopped and \
+                    utils.check_permissions(interaction.channel.permissions_for(interaction.guild.me),
+                                            interaction.channel):
                 if self.button_type == 'Accept':
                     embed = accept_request(game_instance, interaction.user.id)
                     if embed is True:
@@ -93,11 +99,12 @@ class request_button(discord.ui.Button):
                     await interaction.message.edit(embed=embed,
                                                    view=game_button_view(game_instance))
             else:
-                game_instance.finished = True
+                game_instance.stopped = True
                 running_games.pop(game_instance.playerX_id)
                 running_games.pop(game_instance.playerO_id)
                 try:
-                    await interaction.message.edit(content=utils.get_invalid_perms_message(), view=None, embed=None)
+                    await interaction.message.edit(content=utils.get_invalid_perms_message(
+                        interaction.channel), view=None, embed=None)
                 except discord.errors.Forbidden:
                     pass
         await interaction.response.defer()

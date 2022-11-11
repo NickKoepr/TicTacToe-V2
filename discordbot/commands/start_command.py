@@ -76,7 +76,7 @@ class start_buttons_view(discord.ui.View):
     async def accept(self, interaction: discord.Interaction, button: discord.ui.Button):
         requests = try_accepting_request(interaction.user.id, interaction.message.id)
         if requests is not False:
-            if utils.check_permissions(interaction.channel.permissions_for(interaction.guild.me)):
+            if utils.check_permissions(interaction.channel.permissions_for(interaction.guild.me), interaction.channel):
                 accepted_request = requests[0]
                 # This code only runs when the bot has the right permission.
                 game_instance = GameInstance(
@@ -102,7 +102,8 @@ class start_buttons_view(discord.ui.View):
                             await message.edit(embed=embed, view=None)
             else:
                 try:
-                    await interaction.message.edit(content=utils.get_invalid_perms_message(), view=None, embed=None)
+                    await interaction.message.edit(content=utils.get_invalid_perms_message(interaction.channel),
+                                                   view=None, embed=None)
                 except discord.errors.Forbidden:
                     pass
         await interaction.response.defer()

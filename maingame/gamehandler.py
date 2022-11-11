@@ -17,7 +17,6 @@ def is_available(pos: int, board: list):
     """
     Checks is the given location is available.
 
-    :param row: The chosen row.
     :param pos: The chosen position in the given row.
     :param board: The current game board.
     :return: True or False
