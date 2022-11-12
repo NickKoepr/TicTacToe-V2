@@ -46,4 +46,4 @@ def get_invalid_perms_message(channel) -> str:
 
 def debug(msg):
     if debug_enabled:
-        print(msg)
+        print(f'DEBUG: {msg}')
