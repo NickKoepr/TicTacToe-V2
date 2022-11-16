@@ -68,8 +68,34 @@ def current_date_exists() -> bool:
 
 
 def get_current_date() -> str:
-    """
-    Returns the current date for in the database.
+    """Returns the current date for in the database.
+
     :return: time string
     """
     return time.strftime('%Y-%m-%d', time.localtime())
+
+
+def get_stats(cur=cursor) -> dict:
+    """Returns the summed stats in a dict.
+
+    :param cur: The database cursor that the function has to use.
+    :return: Dict with all the bot stats.
+    """
+    cur.execute('SELECT sum(total_commands), '
+                'sum(start_command), '
+                'sum(help_command), '
+                'sum(stop_command), '
+                'sum(total_games) FROM stats')
+    result = cur.fetchall()[0]
+    return {
+        'total_commands': result[0],
+        'start_command': result[1],
+        'help_command': result[2],
+        'stop_command': result[3],
+        'total_games': result[4]
+    }
+
+def disconnect_database():
+    """Close the database cursor and connection."""
+    cursor.close()
+    connection.close()

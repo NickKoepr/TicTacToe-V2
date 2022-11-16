@@ -1,11 +1,16 @@
+import sqlite3
+import threading
+import asyncio
+
 from discord import app_commands
 
+from database.database import get_stats
 from discordbot.commands.help_command import get_help_embed
 from discordbot.commands.start_command import *
 from discordbot.commands.stop_command import check_stop_command, get_nothing_cancel_embed
+from discordbot.game.game_manager import has_running_game, running_games
 from discordbot.views import game_button_view
 from request.request_manager import *
-from discordbot.game.game_manager import has_running_game
 
 intents = discord.Intents.default()
 
@@ -15,6 +20,45 @@ synced = False
 
 # Using local commands for testing instead of public commands.
 guildId = '720702767211216928'
+
+
+def console():
+    connection = sqlite3.connect('tictactoe.db')
+    cursor = connection.cursor()
+    while True:
+        user_input = input().strip().lower()
+        match user_input:
+            case 'help':
+                print('TicTacToe console commands\n'
+                      'stats - Get different stats from the bot.\n'
+                      'stop - Shut down the Discord bot.\n'
+                      'debug - Turn the debug messages on or off.')
+            case 'stats':
+                stats = get_stats(cursor)
+                print(f'TicTacToe Discord bot stats:\n'
+                      f'Bot version: {utils.bot_version}\n'
+                      f'Latency: {round(client.latency * 1000)}ms\n'
+                      f'Bot uptime: {utils.get_uptime()}\n'
+                      f'Active games: {len(running_games)}\n'
+                      f'Active requests: {len(inviter_users)}\n'
+                      f'Current server count: {len(client.guilds)}\n'
+                      f'Total commands send: {stats["total_commands"]}\n'
+                      f'- Total start commands sent: {stats["start_command"]}\n'
+                      f'- Total help commands sent: {stats["help_command"]}\n'
+                      f'- Total stop commands sent: {stats["stop_command"]}\n'
+                      f'Total games played: {stats["total_games"]}')
+            case 'stop':
+                print('Not implemented yet!')
+            case 'debug':
+                match utils.debug_enabled:
+                    case True:
+                        utils.debug_enabled = False
+                        print('The debugger is now off!')
+                    case False:
+                        utils.debug_enabled = True
+                        print('The debugger is now on!')
+            case _:
+                print('This command doesn\'t exists! Type help for list of commands.')
 
 
 @client.event
@@ -29,13 +73,15 @@ with open('token.txt', 'r') as token_file:
     token = token_file.readline()
 
 
-@tree.command(guild=discord.Object(id=guildId), name='help', description='Gives a list of commands that you can use.')
+@tree.command(guild=discord.Object(id=guildId), name='help',
+              description='Gives a list of commands that you can use.')
 async def help_command(interaction: discord.Interaction):
     embed = get_help_embed()
     await interaction.response.send_message(embed=embed)
 
 
-@tree.command(guild=discord.Object(id=guildId), name='stop', description='Cancel a request or stop a running maingame.')
+@tree.command(guild=discord.Object(id=guildId), name='stop',
+              description='Cancel a request or stop a running maingame.')
 async def stop_command(interaction: discord.Interaction):
     if not utils.check_permissions(interaction.channel.permissions_for(interaction.guild.me), interaction.channel):
         await interaction.followup.send(content=utils.get_invalid_perms_message(interaction.channel))
@@ -103,8 +149,14 @@ async def start_command(interaction: discord.Interaction, opponent: discord.Memb
 
     message = await interaction.followup.send(embed=get_request_embed(opponent.name, interaction.user.name),
                                               view=start_buttons_view())
-    create_invite(opponent.name, interaction.user.name, opponent.id, interaction.user.id, message.id,
+    create_invite(opponent.name, interaction.user.name, opponent.id, interaction.user.id, interaction.guild_id,
+                  message.id,
                   interaction.channel_id)
 
 
-client.run(token)
+if __name__ == '__main__':
+    threading.Thread(target=console, daemon=True).start()
+
+    utils.time_started = time.time()
+
+    client.run(token)

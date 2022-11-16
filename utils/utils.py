@@ -1,3 +1,5 @@
+import time
+
 import discord
 
 embed_color = discord.Color.from_rgb(64, 255, 255)
@@ -7,6 +9,8 @@ green_color = discord.Color.from_rgb(50, 205, 50)
 x_icon = '<:Xicon:1033418837728698459>'
 o_icon = '<:Oicon:1033420163497852978>'
 debug_enabled = True
+bot_version = '2.0'
+time_started = 0
 
 
 def check_permissions(permissions: discord.Permissions, channel) -> bool:
@@ -44,6 +48,23 @@ def get_invalid_perms_message(channel) -> str:
     return message
 
 
-def debug(msg):
+def debug(msg: str) -> None:
+    """
+    Place a message in the console if debug is toggled on.
+    :param msg: The message.
+    """
     if debug_enabled:
         print(f'DEBUG: {msg}')
+
+
+def get_uptime() -> str:
+    """
+    Get the uptime from the bot.
+    :return: String with the uptime from the bot.
+    """
+    different_time = round(time.time() - time_started)
+    seconds = different_time
+    minutes = (seconds // 60)
+    hours = (minutes // 60)
+    days = hours // 24
+    return f'{days} day(s), {hours % 24} hour(s), {minutes % 60} minute(s) and {seconds % 60} second(s).'
