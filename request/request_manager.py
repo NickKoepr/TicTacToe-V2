@@ -1,10 +1,13 @@
+import time
+
 from request.request import Request
 
 invited_users = dict()
 inviter_users = dict()
 
 
-def create_invite(invited_name: str, inviter_name: str, invited_id: int, inviter_id: int, message_id: int,
+def create_invite(invited_name: str, inviter_name: str, invited_id: int, inviter_id: int, guild_id: int,
+                  message_id: int,
                   channel_id: int):
     """Send an invitation to a user for a main game.
 
@@ -12,11 +15,20 @@ def create_invite(invited_name: str, inviter_name: str, invited_id: int, inviter
     :param invited_name: The name of the person that's invited.
     :param invited_id: The user ID of the invited member.
     :param inviter_id: The user ID of the inviter.
+    :param guild_id: The guild ID.
     :param message_id: The message ID of the message.
     :param channel_id: The channel ID of the channel.
     """
 
-    request = Request(invited_name, inviter_name, invited_id, inviter_id, message_id, channel_id)
+    request = Request(
+        invited_name,
+        inviter_name,
+        invited_id,
+        inviter_id,
+        guild_id,
+        message_id,
+        channel_id,
+        round(time.time()))
 
     if invited_id in invited_users.keys():
         invited_users[invited_id].append(request)
