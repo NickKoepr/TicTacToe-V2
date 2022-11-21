@@ -1,8 +1,9 @@
 import sqlite3
 import threading
-import asyncio
+import time
 
 from discord import app_commands
+from discord.ext import tasks
 
 from database.database import get_stats
 from discordbot.commands.help_command import get_help_embed
@@ -61,9 +62,18 @@ def console():
                 print('This command doesn\'t exists! Type help for list of commands.')
 
 
+@tasks.loop(seconds=2)
+async def start_timer():
+    for request in inviter_users.values():
+        current_time = round(time.time())
+        if (current_time - request.created_at) > 10:
+            print('t')
+
+
 @client.event
 async def on_ready():
     await client.change_presence(activity=discord.Game('TicTacToe (testing)!'))
+    start_timer.start()
     if not synced:
         await tree.sync(guild=discord.Object(id=guildId))
     print(f'Logged in as {client.user}!')
@@ -153,10 +163,8 @@ async def start_command(interaction: discord.Interaction, opponent: discord.Memb
                   message.id,
                   interaction.channel_id)
 
+threading.Thread(target=console, daemon=True).start()
 
-if __name__ == '__main__':
-    threading.Thread(target=console, daemon=True).start()
+utils.time_started = time.time()
 
-    utils.time_started = time.time()
-
-    client.run(token)
+client.run(token)

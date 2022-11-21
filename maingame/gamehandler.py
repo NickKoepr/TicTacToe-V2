@@ -46,3 +46,10 @@ def player_has_won(board):
                 board[combination[2]] == Player.PLAYER_X:
             return [Player.PLAYER_X, combination]
     return None
+
+
+def board_is_full(board):
+    for place in board:
+        if place == Player.NOTHING:
+            return False
+    return True

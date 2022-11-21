@@ -56,6 +56,10 @@ def player_turn(game_instance: GameInstance, pos: int):
         game_instance.finished = True
         game_instance.finished_layout = has_won[1]
         return
+    if board_is_full(game_instance.board):
+        game_instance.finished = True
+        game_instance.finished_layout = []
+        return
     if current_turn == Player.PLAYER_O:
         game_instance.turn = Player.PLAYER_X
     else:
@@ -72,10 +76,12 @@ def create_win_embed(game_instance: GameInstance, playerX_accepted, playerO_acce
     otherwise False or None if this player hasn't made a decision yet.
     :return: Embed
     """
-    if game_instance.turn == Player.PLAYER_X:
-        win_name = game_instance.playerX_name
+    if board_is_full(game_instance.board):
+        win_message = 'Tie!'
+    elif game_instance.turn == Player.PLAYER_X:
+        win_message = f'{game_instance.playerX_name} has won!'
     else:
-        win_name = game_instance.playerO_name
+        win_message = f'{game_instance.playerO_name} has won!'
 
     if playerX_accepted is None:
         playerx_emote = ''
@@ -95,7 +101,7 @@ def create_win_embed(game_instance: GameInstance, playerX_accepted, playerO_acce
         title='TicTacToe',
         description=f'{x_icon} = {game_instance.playerX_name}\n'
                     f'{o_icon} = {game_instance.playerO_name}\n\n'
-                    f'**__{win_name} has won!__**\n\n'
+                    f'**__{win_message}__**\n\n'
                     f'**Rematch?**\n'
                     f'*{game_instance.playerX_name}:* {playerx_emote}\n'
                     f'*{game_instance.playerO_name}:* {playero_emote}',
@@ -172,7 +178,7 @@ def decline_request(game_instance: GameInstance, user_id: int):
         running_games.pop(game_instance.playerX_id)
     except KeyError:
         pass
-        
+
     winning_embed = create_win_embed(game_instance, plX, plO)
     print(accepted_rematch)
     print(running_games)
