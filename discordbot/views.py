@@ -1,8 +1,8 @@
 import discord
 
 from discordbot.game.game_instance import GameInstance
-from discordbot.game.game_manager import player_turn, create_board_embed, create_win_embed, accept_request, \
-    create_running_game, decline_request, running_games
+from discordbot.game.game_manager import player_turn, create_board_embed, create_win_embed, accept_rematch, \
+    create_running_game, decline_rematch, running_games
 from maingame.gamehandler import is_available
 from maingame.player import Player
 from utils import utils
@@ -49,18 +49,27 @@ class game_button(discord.ui.Button):
                     await interaction.message.edit(embed=embed,
                                                    view=game_button_view(game_instance))
             else:
-                game_instance.stopped = True
-                try:
-                    running_games.pop(game_instance.playerX_id)
-                    running_games.pop(game_instance.playerO_id)
-                except KeyError:
-                    pass
-                try:
-                    await interaction.message.edit(content=utils.get_invalid_perms_message(
-                        interaction.channel), view=None, embed=None)
-                except discord.errors.Forbidden:
-                    pass
+                await invalid_perms(game_instance, interaction)
         await interaction.response.defer()
+
+
+async def invalid_perms(game_instance: GameInstance, interaction: discord.Interaction):
+    """Stop the game and try to edit the game message if the bot has not the right permissions.
+
+    :param game_instance: game instance
+    :param interaction: interaction
+    """
+    game_instance.stopped = True
+    try:
+        running_games.pop(game_instance.playerX_id)
+        running_games.pop(game_instance.playerO_id)
+    except KeyError:
+        pass
+    try:
+        await interaction.message.edit(content=utils.get_invalid_perms_message(
+            interaction.channel), view=None, embed=None)
+    except discord.errors.Forbidden:
+        pass
 
 
 class request_button(discord.ui.Button):
@@ -77,7 +86,7 @@ class request_button(discord.ui.Button):
                     utils.check_permissions(interaction.channel.permissions_for(interaction.guild.me),
                                             interaction.channel):
                 if self.button_type == 'Accept':
-                    embed = accept_request(game_instance, interaction.user.id)
+                    embed = accept_rematch(game_instance, interaction.user.id)
                     if embed is True:
                         game_instance.playerX_id, game_instance.playerO_id = \
                             game_instance.playerO_id, game_instance.playerX_id
@@ -94,19 +103,12 @@ class request_button(discord.ui.Button):
                     else:
                         await interaction.message.edit(embed=embed)
                 elif self.button_type == 'Decline':
-                    embed = decline_request(game_instance, interaction.user.id)
+                    embed = decline_rematch(game_instance, interaction.user.id)
                     game_instance.stopped = True
                     await interaction.message.edit(embed=embed,
                                                    view=game_button_view(game_instance))
             else:
-                game_instance.stopped = True
-                running_games.pop(game_instance.playerX_id)
-                running_games.pop(game_instance.playerO_id)
-                try:
-                    await interaction.message.edit(content=utils.get_invalid_perms_message(
-                        interaction.channel), view=None, embed=None)
-                except discord.errors.Forbidden:
-                    pass
+                await invalid_perms(game_instance, interaction)
         await interaction.response.defer()
 
 

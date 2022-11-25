@@ -86,8 +86,10 @@ class start_buttons_view(discord.ui.View):
                     playerO_name=accepted_request.inviter_name,
                     board=board.create_default_board(),
                     turn=Player.PLAYER_X,
+                    guild_id=accepted_request.guild_id,
                     message_id=accepted_request.message_id,
-                    channel_id=accepted_request.channel_id
+                    channel_id=accepted_request.channel_id,
+                    last_active=int(time.time())
                 )
                 create_running_game(game_instance)
                 await interaction.message.edit(embed=create_board_embed(game_instance),

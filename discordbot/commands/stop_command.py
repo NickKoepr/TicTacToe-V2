@@ -5,7 +5,7 @@ from request.request import Request
 from discordbot.game.game_manager import has_running_game, running_games
 from discordbot.game.game_instance import GameInstance
 from discordbot.commands.start_command import get_decline_request_embed
-from discordbot.game.game_manager import decline_request
+from discordbot.game.game_manager import decline_rematch
 from utils.utils import x_icon, o_icon, error_color, green_color
 from request.request_manager import decline_request_inviter
 
@@ -88,7 +88,7 @@ def check_stop_command(user_id: int):
                 'stop_embed': get_stop_embed('rematch'),
                 'message_id': game_instance.message_id,
                 'channel_id': game_instance.channel_id,
-                'decline_embed': decline_request(game_instance, user_id),
+                'decline_embed': decline_rematch(game_instance, user_id),
                 'game_instance': game_instance
             }
     return False
