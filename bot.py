@@ -4,7 +4,7 @@ import threading
 from discord import app_commands
 from discord.ext import tasks
 
-from database.database import get_stats, create_tables
+from database.database import get_stats, create_tables, update_stat, Stat
 from discordbot.commands.help_command import get_help_embed
 from discordbot.commands.start_command import *
 from discordbot.commands.stop_command import check_stop_command, get_nothing_cancel_embed
@@ -37,6 +37,7 @@ class TicTacToeClient(discord.Client):
     @tasks.loop(seconds=cancel_time)
     async def start_timer(self):
         """Check if there are games or requests that are idle for too long. If so, cancel the game or request."""
+
         async def cancel_message(guild_id, channel_id, message_id, title, description):
             """Change the active message to a cancel message if the game or request is inactive for a long time.
 
@@ -135,6 +136,8 @@ with open('token.txt', 'r') as token_file:
 @tree.command(guild=discord.Object(id=guildId), name='help',
               description='Gives a list of commands that you can use.')
 async def help_command(interaction: discord.Interaction):
+    update_stat(Stat.HELP_COMMAND)
+    update_stat(Stat.TOTAL_COMMANDS)
     embed = get_help_embed()
     await interaction.response.send_message(embed=embed)
 
@@ -142,6 +145,8 @@ async def help_command(interaction: discord.Interaction):
 @tree.command(guild=discord.Object(id=guildId), name='stop',
               description='Cancel a request or stop a running maingame.')
 async def stop_command(interaction: discord.Interaction):
+    update_stat(Stat.STOP_COMMAND)
+    update_stat(Stat.TOTAL_COMMANDS)
     if not utils.check_permissions(interaction.channel.permissions_for(interaction.guild.me), interaction.channel):
         await interaction.followup.send(content=utils.get_invalid_perms_message(interaction.channel))
         return
@@ -180,6 +185,8 @@ async def stop_command(interaction: discord.Interaction):
               description='Play a match of tic tac toe!')
 @app_commands.describe(opponent='Choose a Discord member you want to play against.')
 async def start_command(interaction: discord.Interaction, opponent: discord.Member):
+    update_stat(Stat.START_COMMAND)
+    update_stat(Stat.TOTAL_COMMANDS)
     await interaction.response.defer(thinking=True)
 
     if not utils.check_permissions(interaction.channel.permissions_for(interaction.guild.me), interaction.channel):

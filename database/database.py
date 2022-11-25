@@ -2,7 +2,7 @@ import sqlite3
 import time
 from enum import Enum
 
-connection = sqlite3.connect('../tictactoe.db')
+connection = sqlite3.connect('tictactoe.db')
 cursor = connection.cursor()
 
 
@@ -31,9 +31,6 @@ def create_tables():
         """
     )
     connection.commit()
-
-
-create_tables()
 
 
 def update_stat(stat: Stat):
@@ -94,6 +91,7 @@ def get_stats(cur=cursor) -> dict:
         'stop_command': result[3],
         'total_games': result[4]
     }
+
 
 def disconnect_database():
     """Close the database cursor and connection."""

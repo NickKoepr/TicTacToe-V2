@@ -5,6 +5,7 @@ import discord
 from discordbot.game.game_instance import GameInstance
 from utils.utils import embed_color, x_icon, o_icon, win_color
 from maingame.gamehandler import *
+from database.database import update_stat, Stat
 
 running_games = dict()
 accepted_rematch = list()
@@ -58,10 +59,12 @@ def player_turn(game_instance: GameInstance, pos: int):
     if has_won is not None:
         game_instance.finished = True
         game_instance.finished_layout = has_won[1]
+        update_stat(Stat.TOTAL_GAMES)
         return
     if board_is_full(game_instance.board):
         game_instance.finished = True
         game_instance.finished_layout = []
+        update_stat(Stat.TOTAL_GAMES)
         return
     if current_turn == Player.PLAYER_O:
         game_instance.turn = Player.PLAYER_X
@@ -113,7 +116,7 @@ def create_win_embed(game_instance: GameInstance, playerX_accepted, playerO_acce
     return embed
 
 
-def accept_request(game_instance: GameInstance, user_id: int):
+def accept_rematch(game_instance: GameInstance, user_id: int):
     """Accept a game rematch.
 
     :param game_instance: The game instance.
@@ -147,7 +150,7 @@ def accept_request(game_instance: GameInstance, user_id: int):
         return create_win_embed(game_instance, plX, plO)
 
 
-def decline_request(game_instance: GameInstance, user_id: int):
+def decline_rematch(game_instance: GameInstance, user_id: int):
     """Decline a game rematch.
 
     :param game_instance: The game instance.
