@@ -1,11 +1,10 @@
 import sqlite3
 import threading
-import time
 
 from discord import app_commands
 from discord.ext import tasks
 
-from database.database import get_stats
+from database.database import get_stats, create_tables
 from discordbot.commands.help_command import get_help_embed
 from discordbot.commands.start_command import *
 from discordbot.commands.stop_command import check_stop_command, get_nothing_cancel_embed
@@ -15,12 +14,79 @@ from request.request_manager import *
 
 intents = discord.Intents.default()
 
-client = discord.Client(intents=intents)
-tree = app_commands.CommandTree(client=client)
 synced = False
+cancel_time = 10
 
 # Using local commands for testing instead of public commands.
 guildId = '720702767211216928'
+
+
+class TicTacToeClient(discord.Client):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    async def setup_hook(self) -> None:
+        self.start_timer.start()
+
+    async def on_ready(self):
+        await client.change_presence(activity=discord.Game('TicTacToe (testing)!'))
+        if not synced:
+            await tree.sync(guild=discord.Object(id=guildId))
+        print(f'Logged in as {client.user}!')
+
+    @tasks.loop(seconds=cancel_time)
+    async def start_timer(self):
+        """Check if there are games or requests that are idle for too long. If so, cancel the game or request."""
+        async def cancel_message(guild_id, channel_id, message_id, title, description):
+            """Change the active message to a cancel message if the game or request is inactive for a long time.
+
+            :param guild_id: guild ID
+            :param channel_id: channel ID
+            :param message_id: message ID
+            :param title: title of the embed
+            :param description: description of the embed
+            """
+            guild = client.get_guild(guild_id)
+            if guild:
+                channel = client.get_channel(channel_id)
+                if channel:
+                    try:
+                        message = await channel.fetch_message(message_id)
+                        embed = discord.Embed(
+                            title=title,
+                            description=description,
+                            color=utils.error_color
+                        )
+                        await message.edit(view=None, embed=embed)
+                    except discord.errors.HTTPException:
+                        pass
+
+        requests = list(inviter_users.values())
+        for request in requests.copy():
+            current_time = round(time.time())
+            if (current_time - request.created_at) > cancel_time:
+                decline_request_inviter(request.inviter_id)
+                await cancel_message(guild_id=request.guild_id,
+                                     channel_id=request.channel_id,
+                                     message_id=request.message_id,
+                                     title='Request cancelled due to inactivity',
+                                     description='This request is cancelled due to inactivity for a long time.')
+        games = list(running_games.values())
+        for game in games.copy():
+            current_time = round(time.time())
+            if (current_time - game.last_active) > cancel_time:
+                if game.playerO_id in running_games.keys():
+                    running_games.pop(game.playerX_id)
+                    running_games.pop(game.playerO_id)
+                    await cancel_message(guild_id=game.guild_id,
+                                         channel_id=game.channel_id,
+                                         message_id=game.message_id,
+                                         title='Game cancelled due to inactivity',
+                                         description='This game is cancelled due to inactivity for a long time.')
+
+
+client = TicTacToeClient(intents=intents)
+tree = app_commands.CommandTree(client=client)
 
 
 def console():
@@ -60,23 +126,6 @@ def console():
                         print('The debugger is now on!')
             case _:
                 print('This command doesn\'t exists! Type help for list of commands.')
-
-
-@tasks.loop(seconds=2)
-async def start_timer():
-    for request in inviter_users.values():
-        current_time = round(time.time())
-        if (current_time - request.created_at) > 10:
-            print('t')
-
-
-@client.event
-async def on_ready():
-    await client.change_presence(activity=discord.Game('TicTacToe (testing)!'))
-    start_timer.start()
-    if not synced:
-        await tree.sync(guild=discord.Object(id=guildId))
-    print(f'Logged in as {client.user}!')
 
 
 with open('token.txt', 'r') as token_file:
@@ -162,6 +211,8 @@ async def start_command(interaction: discord.Interaction, opponent: discord.Memb
     create_invite(opponent.name, interaction.user.name, opponent.id, interaction.user.id, interaction.guild_id,
                   message.id,
                   interaction.channel_id)
+
+create_tables()
 
 threading.Thread(target=console, daemon=True).start()
 
