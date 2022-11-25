@@ -11,7 +11,8 @@ class TestCreateInvite(unittest.TestCase):
             invited_id=1,
             inviter_id=2,
             message_id=1,
-            channel_id=0
+            channel_id=0,
+            guild_id=0
         )
         self.assertTrue(1 in invited_users)
         self.assertTrue(2 in inviter_users)
@@ -23,7 +24,8 @@ class TestCreateInvite(unittest.TestCase):
             invited_id=3,
             inviter_id=4,
             message_id=2,
-            channel_id=0
+            channel_id=0,
+            guild_id=0
         )
         self.assertTrue(3 in invited_users)
         self.assertTrue(4 in inviter_users)
@@ -34,7 +36,8 @@ class TestCreateInvite(unittest.TestCase):
             invited_id=5,
             inviter_id=8,
             message_id=20,
-            channel_id=0
+            channel_id=0,
+            guild_id=0
         )
         self.assertTrue(5 in invited_users)
         self.assertTrue(8 in inviter_users)
@@ -45,7 +48,8 @@ class TestCreateInvite(unittest.TestCase):
             invited_id=8,
             inviter_id=5,
             message_id=2022,
-            channel_id=0
+            channel_id=0,
+            guild_id=0
         )
         self.assertTrue(8 in invited_users)
         self.assertTrue(5 in inviter_users)
@@ -56,7 +60,8 @@ class TestCreateInvite(unittest.TestCase):
             invited_id=5,
             inviter_id=9,
             message_id=8,
-            channel_id=0
+            channel_id=0,
+            guild_id=0
         )
         self.assertTrue(5 in invited_users)
         self.assertTrue(9 in inviter_users)
@@ -67,7 +72,8 @@ class TestCreateInvite(unittest.TestCase):
             invited_id=32,
             inviter_id=40,
             message_id=222,
-            channel_id=0
+            channel_id=0,
+            guild_id=0
         )
         self.assertTrue(32 in invited_users)
         self.assertTrue(40 in inviter_users)
@@ -79,7 +85,8 @@ class TestCreateInvite(unittest.TestCase):
             invited_id=1,
             inviter_id=2,
             message_id=1,
-            channel_id=0
+            channel_id=0,
+            guild_id=0
         )
 
         create_invite(
@@ -88,7 +95,8 @@ class TestCreateInvite(unittest.TestCase):
             invited_id=3,
             inviter_id=4,
             message_id=2,
-            channel_id=0
+            channel_id=0,
+            guild_id=0
         )
         create_invite(
             invited_name='test_name',
@@ -96,7 +104,8 @@ class TestCreateInvite(unittest.TestCase):
             invited_id=5,
             inviter_id=8,
             message_id=20,
-            channel_id=0
+            channel_id=0,
+            guild_id=0
         )
 
         create_invite(
@@ -105,7 +114,8 @@ class TestCreateInvite(unittest.TestCase):
             invited_id=8,
             inviter_id=5,
             message_id=2022,
-            channel_id=0
+            channel_id=0,
+            guild_id=0
         )
 
         create_invite(
@@ -114,7 +124,8 @@ class TestCreateInvite(unittest.TestCase):
             invited_id=5,
             inviter_id=9,
             message_id=8,
-            channel_id=0
+            channel_id=0,
+            guild_id=0
         )
 
         create_invite(
@@ -123,7 +134,8 @@ class TestCreateInvite(unittest.TestCase):
             invited_id=32,
             inviter_id=40,
             message_id=222,
-            channel_id=0
+            channel_id=0,
+            guild_id=0
         )
 
         a = try_accepting_request(1, 1)

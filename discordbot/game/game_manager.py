@@ -1,3 +1,5 @@
+import time
+
 import discord
 
 from discordbot.game.game_instance import GameInstance
@@ -52,6 +54,7 @@ def player_turn(game_instance: GameInstance, pos: int):
     current_turn = game_instance.turn
     update_board(current_turn, pos, game_instance.board)
     has_won = player_has_won(game_instance.board)
+    game_instance.last_active = int(time.time())
     if has_won is not None:
         game_instance.finished = True
         game_instance.finished_layout = has_won[1]
