@@ -1,3 +1,4 @@
+import asyncio
 import sqlite3
 import threading
 
@@ -24,14 +25,15 @@ guildId = '720702767211216928'
 class TicTacToeClient(discord.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.tree = app_commands.CommandTree(self)
 
     async def setup_hook(self) -> None:
         self.start_timer.start()
+        await self.tree.sync()
 
     async def on_ready(self):
-        await client.change_presence(activity=discord.Game('TicTacToe (testing)!'))
-        if not synced:
-            await tree.sync(guild=discord.Object(id=guildId))
+        await client.change_presence(activity=discord.Game(presence_text()))
+
         print(f'Logged in as {client.user}!')
 
     @tasks.loop(seconds=cancel_time)
@@ -87,7 +89,6 @@ class TicTacToeClient(discord.Client):
 
 
 client = TicTacToeClient(intents=intents)
-tree = app_commands.CommandTree(client=client)
 
 
 def console():
@@ -100,7 +101,8 @@ def console():
                 print('TicTacToe console commands\n'
                       'stats - Get different stats from the bot.\n'
                       'stop - Shut down the Discord bot.\n'
-                      'debug - Turn the debug messages on or off.')
+                      'debug - Turn the debug messages on or off.\n'
+                      'presence - Change the presence message on Discord.')
             case 'stats':
                 stats = get_stats(cursor)
                 print(f'TicTacToe Discord bot stats:\n'
@@ -117,6 +119,7 @@ def console():
                       f'Total games played: {stats["total_games"]}')
             case 'stop':
                 print('Not implemented yet!')
+
             case 'debug':
                 match utils.debug_enabled:
                     case True:
@@ -125,16 +128,30 @@ def console():
                     case False:
                         utils.debug_enabled = True
                         print('The debugger is now on!')
+            case 'presence':
+                presence = input('Please enter a new presence: ').strip()
+                presence_text(presence)
+                asyncio.run(client.change_presence(activity=discord.Game(presence)))
+                print(f'Presence changed to \'{presence}\'!')
             case _:
                 print('This command doesn\'t exists! Type help for list of commands.')
+
+
+def presence_text(text=None):
+    if not text:
+        with open('presence_text.txt', 'r') as presence_file:
+            return presence_file.read()
+    else:
+        with open('presence_text.txt', 'w') as presence_file:
+            presence_file.write(text)
 
 
 with open('token.txt', 'r') as token_file:
     token = token_file.readline()
 
 
-@tree.command(guild=discord.Object(id=guildId), name='help',
-              description='Gives a list of commands that you can use.')
+@client.tree.command(name='help',
+                     description='Gives a list of commands that you can use.')
 async def help_command(interaction: discord.Interaction):
     update_stat(Stat.HELP_COMMAND)
     update_stat(Stat.TOTAL_COMMANDS)
@@ -142,8 +159,8 @@ async def help_command(interaction: discord.Interaction):
     await interaction.response.send_message(embed=embed)
 
 
-@tree.command(guild=discord.Object(id=guildId), name='stop',
-              description='Cancel a request or stop a running maingame.')
+@client.tree.command(name='stop',
+                     description='Cancel a request or stop a running maingame.')
 async def stop_command(interaction: discord.Interaction):
     update_stat(Stat.STOP_COMMAND)
     update_stat(Stat.TOTAL_COMMANDS)
@@ -181,8 +198,8 @@ async def stop_command(interaction: discord.Interaction):
         await interaction.response.send_message(embed=stop_result['stop_embed'])
 
 
-@tree.command(guild=discord.Object(id=guildId), name='start',
-              description='Play a match of tic tac toe!')
+@client.tree.command(name='start',
+                     description='Play a match of tic tac toe!')
 @app_commands.describe(opponent='Choose a Discord member you want to play against.')
 async def start_command(interaction: discord.Interaction, opponent: discord.Member):
     update_stat(Stat.START_COMMAND)
@@ -218,6 +235,7 @@ async def start_command(interaction: discord.Interaction, opponent: discord.Memb
     create_invite(opponent.name, interaction.user.name, opponent.id, interaction.user.id, interaction.guild_id,
                   message.id,
                   interaction.channel_id)
+
 
 create_tables()
 
