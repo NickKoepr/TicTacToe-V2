@@ -1,6 +1,7 @@
 import asyncio
 import sqlite3
 import threading
+import os.path
 
 from discord import app_commands
 from discord.ext import tasks
@@ -137,14 +138,19 @@ def presence_text(text=None):
         with open('presence_text.txt', 'w') as presence_file:
             presence_file.write(text)
 
-
-with open('token.txt', 'r') as token_file:
-    token = token_file.readline()
-
+if os.path.isfile('token.txt'):
+    with open('token.txt', 'r') as token_file:
+        token = token_file.readline()
+else:
+    with open('token.txt', 'w') as token_file:
+        input_token = input('Thanks for using the TicTacToe Discord bot!\nPlease paste your bot token here: ').strip()
+        token_file.write(input_token)
+        token = input_token
 
 @client.tree.command(name='help',
                      description='Gives a list of commands that you can use.')
 async def help_command(interaction: discord.Interaction):
+    debug('help command sent')
     update_stat(Stat.HELP_COMMAND)
     update_stat(Stat.TOTAL_COMMANDS)
     embed = get_help_embed()
@@ -154,6 +160,7 @@ async def help_command(interaction: discord.Interaction):
 @client.tree.command(name='stop',
                      description='Cancel a request or stop a running maingame.')
 async def stop_command(interaction: discord.Interaction):
+    debug('stop command sent')
     update_stat(Stat.STOP_COMMAND)
     update_stat(Stat.TOTAL_COMMANDS)
     if not utils.check_permissions(interaction.channel.permissions_for(interaction.guild.me), interaction.channel):
@@ -194,6 +201,7 @@ async def stop_command(interaction: discord.Interaction):
                      description='Play a match of tic tac toe!')
 @app_commands.describe(opponent='Choose a Discord member you want to play against.')
 async def start_command(interaction: discord.Interaction, opponent: discord.Member):
+    debug('start command sent')
     update_stat(Stat.START_COMMAND)
     update_stat(Stat.TOTAL_COMMANDS)
     await interaction.response.defer(thinking=True)
