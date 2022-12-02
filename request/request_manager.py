@@ -1,6 +1,7 @@
 import time
 
 from request.request import Request
+from utils.utils import debug
 
 invited_users = dict()
 inviter_users = dict()
@@ -36,15 +37,23 @@ def create_invite(invited_name: str, inviter_name: str, invited_id: int, inviter
         invited_users[invited_id] = [request]
 
     inviter_users[inviter_id] = request
+    debug(f'Created a new invite (num of invited_users: {len(invited_users)}, num of inviter_users: '
+          f'{len(inviter_users)})')
 
 
-def has_open_request(inviter_id: int):
+def has_open_request(inviter_id: int) -> bool:
+    """Check if an inviter user has an open game request.
+
+    :param inviter_id: The user ID of the inviter.
+    :return: True or False
+    """
+
     if inviter_id in inviter_users.keys():
         return True
     return False
 
 
-def try_accepting_request(invited_id: int, message_id: int):
+def try_accepting_request(invited_id: int, message_id: int) -> bool | list:
     """Try accepting an invite request with the invited_id and the message_id.
 
     :param invited_id: The user ID of the invited member.
@@ -91,12 +100,13 @@ def try_accepting_request(invited_id: int, message_id: int):
                         decline_requests.append(inviter_invite)
                         inviter_users.pop(inviter_invite.inviter_id)
                     invited_users.pop(inviter_id)
-
+                debug(f'Accepted a invite (num of invited_users: {len(invited_users)}, num of inviter_users: '
+                      f'{len(inviter_users)})')
                 return [invite, decline_requests]
     return False
 
 
-def decline_request_invited(invited_id: int, message_id: int):
+def decline_request_invited(invited_id: int, message_id: int) -> bool:
     """Decline a request based on the inviter id.
 
     :param invited_id: The user ID of the invited member.
@@ -113,11 +123,13 @@ def decline_request_invited(invited_id: int, message_id: int):
                 else:
                     invited_users[invited_id].remove(request)
                 inviter_users.pop(request.inviter_id)
+                debug(f'Declined a invite (num of invited_users: {len(invited_users)}, num of inviter_users: '
+                      f'{len(inviter_users)})')
                 return True
     return False
 
 
-def decline_request_inviter(inviter_id: int):
+def decline_request_inviter(inviter_id: int) -> bool:
     """Decline a request based on the inviter id.
 
     :param inviter_id: The user ID of the inviter.
@@ -131,13 +143,13 @@ def decline_request_inviter(inviter_id: int):
         else:
             invited_users[invited_id].remove(request)
         inviter_users.pop(inviter_id)
-        print(invited_users)
-        print(inviter_users)
+        debug(f'Declined a invite (num of invited_users: {len(invited_users)}, num of inviter_users: '
+              f'{len(inviter_users)})')
         return True
     return False
 
 
-def has_sent_an_invite(inviter_id: int):
+def has_sent_an_invite(inviter_id: int) -> bool:
     """Return False when the given member ID has an open invite request, otherwise return True.
 
     :param inviter_id: The user ID of the inviter.

@@ -9,7 +9,13 @@ from discordbot.game.game_manager import create_board_embed, create_running_game
 from discordbot.views import game_button_view
 
 
-def get_request_embed(invited_name: str, inviter_name: str, ):
+def get_request_embed(invited_name: str, inviter_name: str) -> discord.Embed:
+    """Return the request embed.
+
+    :param invited_name: The name of the invited player.
+    :param inviter_name: The name of the player who has sent the invite.
+    :return: Discord embed
+    """
     embed = discord.Embed(
         title='TicTacToe request',
         description=f'**{invited_name}**, **{inviter_name}** invited you to a match of TicTacToe!',
@@ -18,7 +24,11 @@ def get_request_embed(invited_name: str, inviter_name: str, ):
     return embed
 
 
-def get_already_invite_embed():
+def get_already_invite_embed() -> discord.Embed:
+    """Return the already sent a request embed.
+
+    :return: Discord embed
+    """
     embed = discord.Embed(
         title='You have already sent a request!',
         description='Type `/stop` to cancel your current request.',
@@ -27,7 +37,11 @@ def get_already_invite_embed():
     return embed
 
 
-def get_invite_bot_embed():
+def get_invite_bot_embed() -> discord.Embed:
+    """Return the invalid user embed for a bot.
+
+    :return: Discord embed
+    """
     embed = discord.Embed(
         title='Invalid user',
         description='You cannot play TicTacToe with a bot!',
@@ -37,6 +51,10 @@ def get_invite_bot_embed():
 
 
 def get_invited_self_embed():
+    """Return the invalid user embed for the user itself.
+
+    :return: Discord embed
+    """
     embed = discord.Embed(
         title='Invalid user',
         description='You cannot play TicTacToe with yourself :(',
@@ -45,7 +63,12 @@ def get_invited_self_embed():
     return embed
 
 
-def get_decline_request_embed(name: str):
+def get_decline_request_embed(name: str) -> discord.Embed:
+    """Return the decline request embed.
+
+    :param name: The name of the user that declined the request.
+    :return: Discord embed
+    """
     embed = discord.Embed(
         title='TicTacToe request',
         description=f'*{name} declined the request.*',
@@ -53,7 +76,13 @@ def get_decline_request_embed(name: str):
     return embed
 
 
-def is_in_game(himself: bool, opponent_name: str = 'NA'):
+def is_in_game(himself: bool, opponent_name: str = 'NA') -> discord.Embed:
+    """Return the is already in a game embed.
+
+    :param himself: True if the user was sending the command for himself.
+    :param opponent_name: The name of the opponent if himself is False.
+    :return: Discord embed
+    """
     if himself:
         title = 'You are currently in a running game!'
         description = 'Type `/stop` to cancel your current request.'
@@ -71,6 +100,7 @@ def is_in_game(himself: bool, opponent_name: str = 'NA'):
 class start_buttons_view(discord.ui.View):
     def __init__(self):
         super().__init__()
+        self.timeout = None
 
     @discord.ui.button(label='Accept', style=discord.ButtonStyle.success, custom_id='accept_match')
     async def accept(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -99,9 +129,12 @@ class start_buttons_view(discord.ui.View):
                     embed = get_decline_request_embed(request.invited_name)
                     channel = interaction.guild.get_channel(request.channel_id)
                     if channel is not None:
-                        message = await channel.fetch_message(request.message_id)
-                        if message is not None:
+                        try:
+                            message = await channel.fetch_message(request.message_id)
                             await message.edit(embed=embed, view=None)
+                        except discord.errors.HTTPException:
+                            pass
+
             else:
                 try:
                     await interaction.message.edit(content=utils.get_invalid_perms_message(interaction.channel),

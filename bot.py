@@ -5,7 +5,7 @@ import threading
 from discord import app_commands
 from discord.ext import tasks
 
-from database.database import get_stats, create_tables, update_stat, Stat
+from database.database import get_stats, create_tables, update_stat, Stat, disconnect_database
 from discordbot.commands.help_command import get_help_embed
 from discordbot.commands.start_command import *
 from discordbot.commands.stop_command import check_stop_command, get_nothing_cancel_embed
@@ -16,10 +16,7 @@ from request.request_manager import *
 intents = discord.Intents.default()
 
 synced = False
-cancel_time = 10
-
-# Using local commands for testing instead of public commands.
-guildId = '720702767211216928'
+cancel_time = 60 * 5
 
 
 class TicTacToeClient(discord.Client):
@@ -33,8 +30,6 @@ class TicTacToeClient(discord.Client):
 
     async def on_ready(self):
         await client.change_presence(activity=discord.Game(presence_text()))
-
-        print(f'Logged in as {client.user}!')
 
     @tasks.loop(seconds=cancel_time)
     async def start_timer(self):
@@ -79,6 +74,7 @@ class TicTacToeClient(discord.Client):
             current_time = round(time.time())
             if (current_time - game.last_active) > cancel_time:
                 if game.playerO_id in running_games.keys():
+                    print('removed a game!')
                     running_games.pop(game.playerX_id)
                     running_games.pop(game.playerO_id)
                     await cancel_message(guild_id=game.guild_id,
@@ -100,7 +96,6 @@ def console():
             case 'help':
                 print('TicTacToe console commands\n'
                       'stats - Get different stats from the bot.\n'
-                      'stop - Shut down the Discord bot.\n'
                       'debug - Turn the debug messages on or off.\n'
                       'presence - Change the presence message on Discord.')
             case 'stats':
@@ -109,7 +104,7 @@ def console():
                       f'Bot version: {utils.bot_version}\n'
                       f'Latency: {round(client.latency * 1000)}ms\n'
                       f'Bot uptime: {utils.get_uptime()}\n'
-                      f'Active games: {len(running_games)}\n'
+                      f'Active games: {round(len(running_games) / 2)}\n'
                       f'Active requests: {len(inviter_users)}\n'
                       f'Current server count: {len(client.guilds)}\n'
                       f'Total commands send: {stats["total_commands"]}\n'
@@ -117,9 +112,6 @@ def console():
                       f'- Total help commands sent: {stats["help_command"]}\n'
                       f'- Total stop commands sent: {stats["stop_command"]}\n'
                       f'Total games played: {stats["total_games"]}')
-            case 'stop':
-                print('Not implemented yet!')
-
             case 'debug':
                 match utils.debug_enabled:
                     case True:

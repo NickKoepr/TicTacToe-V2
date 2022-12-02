@@ -4,7 +4,11 @@ from utils import utils
 import discord
 
 
-def get_help_embed():
+def get_help_embed() -> discord.Embed:
+    """Returns the help embed for the help command.
+
+    :return: Discord embed
+    """
     embed = discord.Embed(title='TicTacToe help', color=utils.embed_color,
                           timestamp=datetime.datetime.utcnow())
     embed.add_field(name='**__/start [username]__**', value='**Play a match of tic tac toe!**', inline=False)

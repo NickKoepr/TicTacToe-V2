@@ -35,6 +35,7 @@ class game_button(discord.ui.Button):
         player_x = game_instance.playerX_id
         player_o = game_instance.playerO_id
         pos = int(interaction.data['custom_id'])
+
         if game_instance.turn == Player.PLAYER_X and interaction.user.id == player_x \
                 or game_instance.turn == Player.PLAYER_O and interaction.user.id == player_o:
             if not game_instance.stopped and \
@@ -42,10 +43,12 @@ class game_button(discord.ui.Button):
                                             interaction.channel):
                 if is_available(pos, game_instance.board):
                     player_turn(game_instance, pos)
+
                     if game_instance.finished:
                         embed = create_win_embed(game_instance, None, None)
                     else:
                         embed = create_board_embed(game_instance)
+
                     await interaction.message.edit(embed=embed,
                                                    view=game_button_view(game_instance))
             else:
@@ -81,27 +84,32 @@ class request_button(discord.ui.Button):
 
     async def callback(self, interaction: discord.Interaction):
         game_instance = self.game_instance
+
         if game_instance.playerO_id == interaction.user.id or game_instance.playerX_id == interaction.user.id:
             if not game_instance.stopped and \
                     utils.check_permissions(interaction.channel.permissions_for(interaction.guild.me),
                                             interaction.channel):
+
                 if self.button_type == 'Accept':
                     embed = accept_rematch(game_instance, interaction.user.id)
                     if embed is True:
                         game_instance.playerX_id, game_instance.playerO_id = \
                             game_instance.playerO_id, game_instance.playerX_id
+
                         game_instance.playerX_name, game_instance.playerO_name = \
                             game_instance.playerO_name, game_instance.playerX_name
+
                         game_instance.finished = False
                         game_instance.finished_layout = []
                         game_instance.turn = Player.PLAYER_X
                         game_instance.board = create_default_board()
                         create_running_game(game_instance)
-                        print(game_instance)
+
                         await interaction.message.edit(embed=create_board_embed(game_instance),
                                                        view=game_button_view(game_instance))
                     else:
                         await interaction.message.edit(embed=embed)
+
                 elif self.button_type == 'Decline':
                     embed = decline_rematch(game_instance, interaction.user.id)
                     game_instance.stopped = True
@@ -115,6 +123,7 @@ class request_button(discord.ui.Button):
 class game_button_view(discord.ui.View):
     def __init__(self, game_instance: GameInstance):
         super().__init__()
+        self.timeout = None
         for i in range(9):
             self.add_item(game_button(game_instance, i))
         if game_instance.finished and not game_instance.stopped:

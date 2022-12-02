@@ -2,8 +2,7 @@ from maingame.player import Player
 
 
 def update_board(player: Player, pos: int, board: list):
-    """
-    Update the maingame layout with the move of the player.
+    """Update the maingame layout with the move of the player.
 
     :param player: The player number that's placing.
     :param pos: The selected position.
@@ -13,9 +12,8 @@ def update_board(player: Player, pos: int, board: list):
     board[pos] = player
 
 
-def is_available(pos: int, board: list):
-    """
-    Checks is the given location is available.
+def is_available(pos: int, board: list) -> bool:
+    """Checks is the given location is available.
 
     :param pos: The chosen position in the given row.
     :param board: The current game board.
@@ -27,9 +25,8 @@ def is_available(pos: int, board: list):
         return False
 
 
-def player_has_won(board):
-    """
-    Checks if a player has won.
+def player_has_won(board) -> list | None:
+    """Checks if a player has won.
 
     :param board: The current game board.
     :return: When someone wins the game, the player and the winning combination is returned, otherwise None.
@@ -48,7 +45,12 @@ def player_has_won(board):
     return None
 
 
-def board_is_full(board):
+def board_is_full(board) -> bool:
+    """Check if the board is full.
+
+    :param board: The current game board.
+    :return: True when the board is full, otherwise False.
+    """
     for place in board:
         if place == Player.NOTHING:
             return False

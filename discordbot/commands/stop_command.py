@@ -10,11 +10,22 @@ from utils.utils import x_icon, o_icon, error_color, green_color
 from request.request_manager import decline_request_inviter
 
 
-def get_request_decline_embed(request: Request):
+def get_request_decline_embed(request: Request) -> discord.Embed:
+    """Return the declined request embed.
+
+    :param request: The request
+    :return: Discord embed
+    """
     return get_decline_request_embed(request.inviter_name)
 
 
-def get_game_decline_embed(user_id: int, game_instance: GameInstance):
+def get_game_decline_embed(user_id: int, game_instance: GameInstance) -> discord.Embed:
+    """Get the canceled embed for a game if a player cancelled the game.
+
+    :param user_id: The ID of the user that canceled the game.
+    :param game_instance: The game instance.
+    :return: Discord embed
+    """
     match user_id:
         case game_instance.playerO_id:
             username = game_instance.playerO_name
@@ -35,7 +46,12 @@ def get_game_decline_embed(user_id: int, game_instance: GameInstance):
     return embed
 
 
-def get_stop_embed(stop_type: str):
+def get_stop_embed(stop_type: str) -> discord.Embed:
+    """Get the embed for the stop command.
+
+    :param stop_type: The type of activity that has been stopped (game, request or rematch).
+    :return: Discord embed
+    """
     embed = discord.Embed(
         title=f'Your {stop_type} is cancelled',
         description=f'Your {stop_type} is cancelled successfully.',
@@ -44,7 +60,11 @@ def get_stop_embed(stop_type: str):
     return embed
 
 
-def get_nothing_cancel_embed():
+def get_nothing_cancel_embed() -> discord.Embed:
+    """Return embed if there is nothing to cancel.
+
+    :return: Discord embed
+    """
     embed = discord.Embed(
         title=f'There is nothing to cancel!',
         description='You can only use the stop command when you are playing a game or if you have an open request.',
@@ -53,8 +73,9 @@ def get_nothing_cancel_embed():
     return embed
 
 
-def check_stop_command(user_id: int):
+def check_stop_command(user_id: int) -> dict | bool:
     """Check if a player has an open request, running game or an open rematch request.
+
     :param user_id: The ID of the user.
     :return: Dict with information if the user has an open request, running game or an open rematch request.
     Otherwise, False.

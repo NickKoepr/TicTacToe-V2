@@ -49,8 +49,8 @@ def get_invalid_perms_message(channel) -> str:
 
 
 def debug(msg: str) -> None:
-    """
-    Place a message in the console if debug is toggled on.
+    """Place a message in the console if debug is toggled on.
+
     :param msg: The message.
     """
     if debug_enabled:
@@ -58,8 +58,8 @@ def debug(msg: str) -> None:
 
 
 def get_uptime() -> str:
-    """
-    Get the uptime from the bot.
+    """Get the uptime from the bot.
+
     :return: String with the uptime from the bot.
     """
     different_time = round(time.time() - time_started)

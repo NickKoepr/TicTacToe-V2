@@ -1,9 +1,8 @@
 from maingame.player import Player
 
 
-def create_default_board():
-    """
-    Generate a default (empty) board.
+def create_default_board() -> list:
+    """Generate a default (empty) board.
 
     :return: a list with the default board.
     """
