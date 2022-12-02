@@ -229,3 +229,7 @@ def remove_game(playerO_id, playerX_id):
         running_games.pop(playerX_id)
     except KeyError:
         pass
+    finally:
+        debug('Stopped a running game. '
+              f'(num of running_games: {len(running_games)}/{round(len(running_games) / 2)}, num of '
+              f'accepted_rematch: {len(accepted_rematch)})')

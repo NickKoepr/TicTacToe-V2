@@ -2,7 +2,7 @@ import discord
 
 from request.request_manager import has_open_request, inviter_users
 from request.request import Request
-from discordbot.game.game_manager import has_running_game, running_games
+from discordbot.game.game_manager import has_running_game, remove_game, running_games
 from discordbot.game.game_instance import GameInstance
 from discordbot.commands.start_command import get_decline_request_embed
 from discordbot.game.game_manager import decline_rematch
@@ -93,8 +93,7 @@ def check_stop_command(user_id: int) -> dict | bool:
     elif has_running_game(user_id):
         game_instance: GameInstance = running_games[user_id]
         if not game_instance.finished:
-            running_games.pop(game_instance.playerO_id)
-            running_games.pop(game_instance.playerX_id)
+            remove_game(game_instance.playerO_id, game_instance.playerX_id)
             return {
                 'stop_type': 'game',
                 'stop_embed': get_stop_embed('game'),
