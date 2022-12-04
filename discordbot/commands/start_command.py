@@ -127,13 +127,15 @@ class start_buttons_view(discord.ui.View):
                 # Decline all these requests:
                 for request in requests[1]:
                     embed = get_decline_request_embed(request.invited_name)
-                    channel = interaction.guild.get_channel(request.channel_id)
-                    if channel is not None:
-                        try:
-                            message = await channel.fetch_message(request.message_id)
-                            await message.edit(embed=embed, view=None)
-                        except discord.errors.HTTPException:
-                            pass
+                    guild = interaction.client.get_guild(request.guild_id)
+                    if guild is not None:
+                        channel = guild.get_channel(request.channel_id)
+                        if channel is not None:
+                            try:
+                                message = await channel.fetch_message(request.message_id)
+                                await message.edit(embed=embed, view=None)
+                            except discord.errors.HTTPException:
+                                pass
 
             else:
                 try:

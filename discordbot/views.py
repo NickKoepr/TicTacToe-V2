@@ -2,7 +2,7 @@ import discord
 
 from discordbot.game.game_instance import GameInstance
 from discordbot.game.game_manager import player_turn, create_board_embed, create_win_embed, accept_rematch, \
-    create_running_game, decline_rematch, running_games
+    create_running_game, decline_rematch, running_games, remove_game
 from maingame.gamehandler import is_available
 from maingame.player import Player
 from utils import utils
@@ -64,8 +64,7 @@ async def invalid_perms(game_instance: GameInstance, interaction: discord.Intera
     """
     game_instance.stopped = True
     try:
-        running_games.pop(game_instance.playerX_id)
-        running_games.pop(game_instance.playerO_id)
+        remove_game(game_instance.playerO_id, game_instance.playerX_id)
     except KeyError:
         pass
     try:

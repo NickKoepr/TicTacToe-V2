@@ -6,11 +6,11 @@ import os.path
 from discord import app_commands
 from discord.ext import tasks
 
-from database.database import get_stats, create_tables, update_stat, Stat, disconnect_database
+from database.database import get_stats, create_tables, update_stat, Stat
 from discordbot.commands.help_command import get_help_embed
 from discordbot.commands.start_command import *
 from discordbot.commands.stop_command import check_stop_command, get_nothing_cancel_embed
-from discordbot.game.game_manager import has_running_game, running_games
+from discordbot.game.game_manager import has_running_game, running_games, remove_game
 from discordbot.views import game_button_view
 from request.request_manager import *
 
@@ -51,6 +51,10 @@ class TicTacToeClient(discord.Client):
                 if channel:
                     try:
                         message = await channel.fetch_message(message_id)
+                        if not utils.check_permissions(channel.permissions_for(guild.me), channel):
+                            await message.edit(
+                                content=utils.get_invalid_perms_message(channel), view=None)
+                            return
                         embed = discord.Embed(
                             title=title,
                             description=description,
@@ -70,14 +74,13 @@ class TicTacToeClient(discord.Client):
                                      message_id=request.message_id,
                                      title='Request cancelled due to inactivity',
                                      description='This request is cancelled due to inactivity for a long time.')
+
         games = list(running_games.values())
         for game in games.copy():
             current_time = round(time.time())
             if (current_time - game.last_active) > cancel_time:
                 if game.playerO_id in running_games.keys():
-                    print('removed a game!')
-                    running_games.pop(game.playerX_id)
-                    running_games.pop(game.playerO_id)
+                    remove_game(game.playerO_id, game.playerX_id)
                     await cancel_message(guild_id=game.guild_id,
                                          channel_id=game.channel_id,
                                          message_id=game.message_id,
@@ -138,6 +141,7 @@ def presence_text(text=None):
         with open('presence_text.txt', 'w') as presence_file:
             presence_file.write(text)
 
+
 if os.path.isfile('token.txt'):
     with open('token.txt', 'r') as token_file:
         token = token_file.readline()
@@ -146,6 +150,7 @@ else:
         input_token = input('Thanks for using the TicTacToe Discord bot!\nPlease paste your bot token here: ').strip()
         token_file.write(input_token)
         token = input_token
+
 
 @client.tree.command(name='help',
                      description='Gives a list of commands that you can use.')
@@ -161,6 +166,7 @@ async def help_command(interaction: discord.Interaction):
                      description='Cancel a request or stop a running maingame.')
 async def stop_command(interaction: discord.Interaction):
     debug('stop command sent')
+    await interaction.response.defer(thinking=True)
     update_stat(Stat.STOP_COMMAND)
     update_stat(Stat.TOTAL_COMMANDS)
     if not utils.check_permissions(interaction.channel.permissions_for(interaction.guild.me), interaction.channel):
@@ -170,7 +176,7 @@ async def stop_command(interaction: discord.Interaction):
     # Get the stop result if a user types the stop command.
     stop_result = check_stop_command(interaction.user.id)
     if not stop_result:
-        await interaction.response.send_message(embed=get_nothing_cancel_embed())
+        await interaction.followup.send(embed=get_nothing_cancel_embed())
     else:
         channel_id = stop_result['channel_id']
         message_id = stop_result['message_id']
@@ -194,7 +200,7 @@ async def stop_command(interaction: discord.Interaction):
                 )
             except discord.NotFound:
                 pass
-        await interaction.response.send_message(embed=stop_result['stop_embed'])
+        await interaction.followup.send(embed=stop_result['stop_embed'])
 
 
 @client.tree.command(name='start',

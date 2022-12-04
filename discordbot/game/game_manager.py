@@ -28,11 +28,10 @@ def create_running_game(game_instance: GameInstance):
 
     :param game_instance: The game instance.
     """
-    debug(f'Created running game (num of running_games: {len(running_games)}/{round(len(running_games) / 2)}, num of '
-          f'accepted_rematch: {len(accepted_rematch)})')
     running_games[game_instance.playerX_id] = game_instance
     running_games[game_instance.playerO_id] = game_instance
-
+    debug(f'Created running game (num of running_games: {len(running_games)}/{round(len(running_games) / 2)}, num of '
+          f'accepted_rematch: {len(accepted_rematch)})')
 
 def create_board_embed(game_instance: GameInstance) -> discord.Embed:
     """Create the main game board embed.
@@ -98,7 +97,7 @@ def create_win_embed(game_instance: GameInstance, playerX_accepted, playerO_acce
     otherwise False. None if the player has not made a decision yet.
     :return: Discord embed
     """
-    if board_is_full(game_instance.board):
+    if board_is_full(game_instance.board) and not game_instance.finished_layout:
         win_message = 'Draw!'
     elif game_instance.turn == Player.PLAYER_X:
         win_message = f'{game_instance.playerX_name} has won!'
