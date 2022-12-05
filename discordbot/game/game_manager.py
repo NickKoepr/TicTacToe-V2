@@ -206,7 +206,8 @@ def decline_rematch(game_instance: GameInstance, user_id: int) -> discord.Embed:
     winning_embed = create_win_embed(game_instance, plX, plO)
 
     description = winning_embed.description
-    description += f'\n\n*{player_name} declined the rematch. Thanks for playing!*'
+    #description += f'\n\n*{player_name} declined the rematch. Thanks for playing!*'
+    description += f'\n\n*🎄 {player_name} declined the rematch. Merry Christmas and a happy new year! 🎄*'
     winning_embed.description = description
 
     debug(f'A player declined the rematch. '
