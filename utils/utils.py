@@ -56,7 +56,8 @@ def debug(msg: str) -> None:
     :param msg: The message.
     """
     if debug_enabled:
-        print(f'DEBUG: {msg}')
+        date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+        print(f'[{date} DEBUG] {msg}')
 
 
 def get_uptime() -> str:
