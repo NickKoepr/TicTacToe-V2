@@ -85,7 +85,7 @@ def is_in_game(himself: bool, opponent_name: str = 'NA') -> discord.Embed:
     """
     if himself:
         title = 'You are currently in a running game!'
-        description = 'Type `/stop` to cancel your current request.'
+        description = 'Type `/stop` to cancel your current game.'
     else:
         title = f'{opponent_name} is already in a game!'
         description = 'You have to wait for this game to end!'
@@ -148,9 +148,6 @@ class start_buttons_view(discord.ui.View):
     @discord.ui.button(label='Decline', style=discord.ButtonStyle.danger, custom_id='decline_match')
     async def decline(self, interaction: discord.Interaction, button: discord.ui.Button):
         if decline_request_invited(interaction.user.id, interaction.message.id):
-            embed = discord.Embed(
-                title='TicTacToe request',
-                description=f'*{interaction.user.name} declined the request.*',
-                color=utils.error_color)
+            embed = get_decline_request_embed(interaction.user.name)
             await interaction.message.edit(embed=embed, view=None)
         await interaction.response.defer()

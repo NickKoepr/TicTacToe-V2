@@ -19,7 +19,7 @@ def get_request_decline_embed(request: Request) -> discord.Embed:
     return get_decline_request_embed(request.inviter_name)
 
 
-def get_game_decline_embed(user_id: int, game_instance: GameInstance) -> discord.Embed:
+def get_game_cancelled_embed(user_id: int, game_instance: GameInstance) -> discord.Embed:
     """Get the canceled embed for a game if a player cancelled the game.
 
     :param user_id: The ID of the user that canceled the game.
@@ -40,7 +40,7 @@ def get_game_decline_embed(user_id: int, game_instance: GameInstance) -> discord
         f'{x_icon} = {game_instance.playerX_name}\n'
         f'{o_icon} = {game_instance.playerO_name}\n\n'
         f'**__{other_player} has won!__**\n\n'
-        f'*{username} canceled the game.*',
+        f'*{username} cancelled the game.*',
         color=error_color
     )
     return embed
@@ -99,7 +99,7 @@ def check_stop_command(user_id: int) -> dict | bool:
                 'stop_embed': get_stop_embed('game'),
                 'message_id': game_instance.message_id,
                 'channel_id': game_instance.channel_id,
-                'decline_embed': get_game_decline_embed(user_id, game_instance),
+                'decline_embed': get_game_cancelled_embed(user_id, game_instance),
                 'game_instance': game_instance
             }
         else:

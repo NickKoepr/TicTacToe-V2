@@ -71,8 +71,7 @@ def player_turn(game_instance: GameInstance, pos: int):
         game_instance.finished = True
         game_instance.finished_layout = has_won[1]
         update_stat(Stat.TOTAL_GAMES)
-        debug(
-            f'A player has won. (num of running_games: {len(running_games)}/{round(len(running_games) / 2)}, num of '
+        debug(f'A player has won. (num of running_games: {len(running_games)}/{round(len(running_games) / 2)}, num of '
             f'accepted_rematch: {len(accepted_rematch)})')
         return
 
@@ -155,16 +154,14 @@ def accept_rematch(game_instance: GameInstance, user_id: int) -> discord.Embed |
     if other_player in accepted_rematch:
         remove_game(game_instance.playerO_id, game_instance.playerX_id)
         accepted_rematch.remove(other_player)
-        debug(
-            f'Both players accepted a rematch. Starting new game.'
+        debug(f'Both players accepted a rematch. Starting a new game.'
             f' (num of running_games: {len(running_games)}/{round(len(running_games) / 2)}, num of '
             f'accepted_rematch: {len(accepted_rematch)})')
         return True
     else:
         # Add the player to the accepted rematch list.
         accepted_rematch.append(user_id)
-        debug(
-            f'A player accepted a rematch. '
+        debug(f'A player accepted a rematch. '
             f'(num of running_games: {len(running_games)}/{round(len(running_games) / 2)}, num of '
             f'accepted_rematch: {len(accepted_rematch)})')
         return create_win_embed(game_instance, plX, plO)
