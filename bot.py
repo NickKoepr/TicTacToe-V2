@@ -111,7 +111,7 @@ def console():
                       f'Active games: {round(len(running_games) / 2)}\n'
                       f'Active requests: {len(inviter_users)}\n'
                       f'Current server count: {len(client.guilds)}\n'
-                      f'Total commands send: {stats["total_commands"]}\n'
+                      f'Total commands sent: {stats["total_commands"]}\n'
                       f'- Total start commands sent: {stats["start_command"]}\n'
                       f'- Total help commands sent: {stats["help_command"]}\n'
                       f'- Total stop commands sent: {stats["stop_command"]}\n'

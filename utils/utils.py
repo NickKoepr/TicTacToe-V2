@@ -10,7 +10,7 @@ green_color = discord.Color.from_rgb(50, 205, 50)
 #o_icon = '<:Oicon:1033420163497852978>'
 x_icon = '⛄'
 o_icon = '❄️'
-debug_enabled = True
+debug_enabled = False
 bot_version = '2.0'
 time_started = 0
 

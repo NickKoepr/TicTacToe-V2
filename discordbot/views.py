@@ -2,7 +2,7 @@ import discord
 
 from discordbot.game.game_instance import GameInstance
 from discordbot.game.game_manager import player_turn, create_board_embed, create_win_embed, accept_rematch, \
-    create_running_game, decline_rematch, running_games, remove_game
+    create_running_game, decline_rematch, remove_game
 from maingame.gamehandler import is_available
 from maingame.player import Player
 from utils import utils
