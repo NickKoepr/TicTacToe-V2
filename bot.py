@@ -117,13 +117,8 @@ def console():
                       f'- Total stop commands sent: {stats["stop_command"]}\n'
                       f'Total games played: {stats["total_games"]}')
             case 'debug':
-                match utils.debug_enabled:
-                    case True:
-                        utils.debug_enabled = False
-                        print('The debugger is now off!')
-                    case False:
-                        utils.debug_enabled = True
-                        print('The debugger is now on!')
+                utils.debug_enabled = False if utils.debug_enabled else True
+                print(f'The debugger is now {"on" if utils.debug_enabled else "off"}!')
             case 'presence':
                 presence = input('Please enter a new presence: ').strip()
                 presence_text(presence)

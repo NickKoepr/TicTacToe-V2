@@ -19,10 +19,7 @@ def is_available(pos: int, board: list) -> bool:
     :param board: The current game board.
     :return: True or False
     """
-    if board[pos] == Player.NOTHING:
-        return True
-    else:
-        return False
+    return True if board[pos] == Player.NOTHING else False
 
 
 def player_has_won(board) -> list | None:
@@ -45,13 +42,10 @@ def player_has_won(board) -> list | None:
     return None
 
 
-def board_is_full(board) -> bool:
+def board_is_full(board: list) -> bool:
     """Check if the board is full.
 
     :param board: The current game board.
     :return: True when the board is full, otherwise False.
-    """
-    for place in board:
-        if place == Player.NOTHING:
-            return False
-    return True
+    # """
+    return False if Player.NOTHING in board else True

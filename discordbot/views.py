@@ -63,10 +63,7 @@ async def invalid_perms(game_instance: GameInstance, interaction: discord.Intera
     :param interaction: interaction
     """
     game_instance.stopped = True
-    try:
-        remove_game(game_instance.playerO_id, game_instance.playerX_id)
-    except KeyError:
-        pass
+    remove_game(game_instance.playerO_id, game_instance.playerX_id)
     try:
         await interaction.message.edit(content=utils.get_invalid_perms_message(
             interaction.channel), view=None, embed=None)
@@ -86,8 +83,8 @@ class request_button(discord.ui.Button):
 
         if game_instance.playerO_id == interaction.user.id or game_instance.playerX_id == interaction.user.id:
             if not game_instance.stopped and \
-                    utils.check_permissions(interaction.channel.permissions_for(interaction.guild.me),
-                                            interaction.channel):
+            utils.check_permissions(interaction.channel.permissions_for(interaction.guild.me),
+            interaction.channel):
 
                 if self.button_type == 'Accept':
                     embed = accept_rematch(game_instance, interaction.user.id)
