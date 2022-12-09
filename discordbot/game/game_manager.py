@@ -154,7 +154,6 @@ def accept_rematch(game_instance: GameInstance, user_id: int) -> discord.Embed |
     # Remove the current running game and the other player from the accepted_rematch list.
     if other_player in accepted_rematch:
         remove_game(game_instance.playerO_id, game_instance.playerX_id)
-        accepted_rematch.remove(other_player)
         debug(f'Both players accepted a rematch. Starting a new game.'
               f' (num of running_games: {len(running_games)}/{round(len(running_games) / 2)}, num of '
               f'accepted_rematch: {len(accepted_rematch)})')
