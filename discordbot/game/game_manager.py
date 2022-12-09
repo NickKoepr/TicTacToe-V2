@@ -33,6 +33,7 @@ def create_running_game(game_instance: GameInstance):
     debug(f'Created running game (num of running_games: {len(running_games)}/{round(len(running_games) / 2)}, num of '
           f'accepted_rematch: {len(accepted_rematch)})')
 
+
 def create_board_embed(game_instance: GameInstance) -> discord.Embed:
     """Create the main game board embed.
 
@@ -72,7 +73,7 @@ def player_turn(game_instance: GameInstance, pos: int):
         game_instance.finished_layout = has_won[1]
         update_stat(Stat.TOTAL_GAMES)
         debug(f'A player has won. (num of running_games: {len(running_games)}/{round(len(running_games) / 2)}, num of '
-            f'accepted_rematch: {len(accepted_rematch)})')
+              f'accepted_rematch: {len(accepted_rematch)})')
         return
 
     if board_is_full(game_instance.board):
@@ -155,15 +156,15 @@ def accept_rematch(game_instance: GameInstance, user_id: int) -> discord.Embed |
         remove_game(game_instance.playerO_id, game_instance.playerX_id)
         accepted_rematch.remove(other_player)
         debug(f'Both players accepted a rematch. Starting a new game.'
-            f' (num of running_games: {len(running_games)}/{round(len(running_games) / 2)}, num of '
-            f'accepted_rematch: {len(accepted_rematch)})')
+              f' (num of running_games: {len(running_games)}/{round(len(running_games) / 2)}, num of '
+              f'accepted_rematch: {len(accepted_rematch)})')
         return True
     else:
         # Add the player to the accepted rematch list.
         accepted_rematch.append(user_id)
         debug(f'A player accepted a rematch. '
-            f'(num of running_games: {len(running_games)}/{round(len(running_games) / 2)}, num of '
-            f'accepted_rematch: {len(accepted_rematch)})')
+              f'(num of running_games: {len(running_games)}/{round(len(running_games) / 2)}, num of '
+              f'accepted_rematch: {len(accepted_rematch)})')
         return create_win_embed(game_instance, plX, plO)
 
 
@@ -203,7 +204,7 @@ def decline_rematch(game_instance: GameInstance, user_id: int) -> discord.Embed:
     winning_embed = create_win_embed(game_instance, plX, plO)
 
     description = winning_embed.description
-    #description += f'\n\n*{player_name} declined the rematch. Thanks for playing!*'
+    # description += f'\n\n*{player_name} declined the rematch. Thanks for playing!*'
     description += f'\n\n*🎄 {player_name} declined the rematch. Merry Christmas and a happy new year! 🎄*'
     winning_embed.description = description
 
@@ -224,6 +225,11 @@ def remove_game(playerO_id, playerX_id):
     try:
         running_games.pop(playerO_id)
         running_games.pop(playerX_id)
+
+        if playerO_id in accepted_rematch:
+            accepted_rematch.remove(playerO_id)
+        if playerX_id in accepted_rematch:
+            accepted_rematch.remove(playerX_id)
     except KeyError:
         pass
     finally:

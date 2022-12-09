@@ -68,6 +68,7 @@ class TicTacToeClient(discord.Client):
         for request in requests.copy():
             current_time = round(time.time())
             if (current_time - request.created_at) > cancel_time:
+                debug('Cancelled invite due to inactivity:')
                 decline_request_inviter(request.inviter_id)
                 await cancel_message(guild_id=request.guild_id,
                                      channel_id=request.channel_id,
@@ -80,6 +81,7 @@ class TicTacToeClient(discord.Client):
             current_time = round(time.time())
             if (current_time - game.last_active) > cancel_time:
                 if game.playerO_id in running_games.keys():
+                    debug('Cancelled game due to inactivity:')
                     remove_game(game.playerO_id, game.playerX_id)
                     await cancel_message(guild_id=game.guild_id,
                                          channel_id=game.channel_id,
@@ -149,6 +151,7 @@ else:
 
 @client.tree.command(name='help',
                      description='Gives a list of commands that you can use.')
+@app_commands.guild_only()
 async def help_command(interaction: discord.Interaction):
     debug('help command sent')
     update_stat(Stat.HELP_COMMAND)
@@ -159,11 +162,13 @@ async def help_command(interaction: discord.Interaction):
 
 @client.tree.command(name='stop',
                      description='Cancel a request or stop a running maingame.')
+@app_commands.guild_only()
 async def stop_command(interaction: discord.Interaction):
     debug('stop command sent')
-    await interaction.response.defer(thinking=True)
     update_stat(Stat.STOP_COMMAND)
     update_stat(Stat.TOTAL_COMMANDS)
+    await interaction.response.defer(thinking=True)
+
     if not utils.check_permissions(interaction.channel.permissions_for(interaction.guild.me), interaction.channel):
         await interaction.followup.send(content=utils.get_invalid_perms_message(interaction.channel))
         return
@@ -201,6 +206,7 @@ async def stop_command(interaction: discord.Interaction):
 @client.tree.command(name='start',
                      description='Play a match of tic tac toe!')
 @app_commands.describe(opponent='Choose a Discord member you want to play against.')
+@app_commands.guild_only()
 async def start_command(interaction: discord.Interaction, opponent: discord.Member):
     debug('start command sent')
     update_stat(Stat.START_COMMAND)
