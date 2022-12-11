@@ -180,7 +180,6 @@ def decline_rematch(game_instance: GameInstance, user_id: int) -> discord.Embed:
 
         if other_player in accepted_rematch:
             plO = True
-            accepted_rematch.remove(other_player)
         else:
             plO = None
         plX = False
@@ -190,13 +189,9 @@ def decline_rematch(game_instance: GameInstance, user_id: int) -> discord.Embed:
 
         if other_player in accepted_rematch:
             plX = True
-            accepted_rematch.remove(other_player)
         else:
             plX = None
         plO = False
-
-    if user_id in accepted_rematch:
-        accepted_rematch.remove(user_id)
 
     remove_game(game_instance.playerO_id, game_instance.playerX_id)
 

@@ -2,7 +2,7 @@ import discord
 
 from discordbot.game.game_instance import GameInstance
 from discordbot.game.game_manager import player_turn, create_board_embed, create_win_embed, accept_rematch, \
-    create_running_game, decline_rematch, remove_game
+    create_running_game, decline_rematch, remove_game, accepted_rematch
 from maingame.gamehandler import is_available
 from maingame.player import Player
 from utils import utils
@@ -83,29 +83,29 @@ class request_button(discord.ui.Button):
 
         if game_instance.playerO_id == interaction.user.id or game_instance.playerX_id == interaction.user.id:
             if not game_instance.stopped and \
-            utils.check_permissions(interaction.channel.permissions_for(interaction.guild.me),
-            interaction.channel):
+                    utils.check_permissions(interaction.channel.permissions_for(interaction.guild.me),
+                                            interaction.channel):
 
                 if self.button_type == 'Accept':
-                    embed = accept_rematch(game_instance, interaction.user.id)
-                    if embed is True:
-                        game_instance.playerX_id, game_instance.playerO_id = \
-                            game_instance.playerO_id, game_instance.playerX_id
+                    if interaction.user.id not in accepted_rematch:
+                        embed = accept_rematch(game_instance, interaction.user.id)
+                        if embed is True:
+                            game_instance.playerX_id, game_instance.playerO_id = \
+                                game_instance.playerO_id, game_instance.playerX_id
 
-                        game_instance.playerX_name, game_instance.playerO_name = \
-                            game_instance.playerO_name, game_instance.playerX_name
+                            game_instance.playerX_name, game_instance.playerO_name = \
+                                game_instance.playerO_name, game_instance.playerX_name
 
-                        game_instance.finished = False
-                        game_instance.finished_layout = []
-                        game_instance.turn = Player.PLAYER_X
-                        game_instance.board = create_default_board()
-                        create_running_game(game_instance)
+                            game_instance.finished = False
+                            game_instance.finished_layout = []
+                            game_instance.turn = Player.PLAYER_X
+                            game_instance.board = create_default_board()
+                            create_running_game(game_instance)
 
-                        await interaction.message.edit(embed=create_board_embed(game_instance),
-                                                       view=game_button_view(game_instance))
-                    else:
-                        await interaction.message.edit(embed=embed)
-
+                            await interaction.message.edit(embed=create_board_embed(game_instance),
+                                                           view=game_button_view(game_instance))
+                        else:
+                            await interaction.message.edit(embed=embed)
                 elif self.button_type == 'Decline':
                     embed = decline_rematch(game_instance, interaction.user.id)
                     game_instance.stopped = True
