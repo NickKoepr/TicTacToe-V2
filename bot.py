@@ -83,11 +83,12 @@ class TicTacToeClient(discord.Client):
                 if game.playerO_id in running_games.keys():
                     debug('Cancelled game due to inactivity:')
                     remove_game(game.playerO_id, game.playerX_id)
-                    await cancel_message(guild_id=game.guild_id,
-                                         channel_id=game.channel_id,
-                                         message_id=game.message_id,
-                                         title='Game cancelled due to inactivity',
-                                         description='This game is cancelled due to inactivity for a long time.')
+                    for game_message in game.game_messages:
+                        await cancel_message(guild_id=game_message.guild_id,
+                                             channel_id=game_message.channel_id,
+                                             message_id=game_message.message_id,
+                                             title='Game cancelled due to inactivity',
+                                             description='This game is cancelled due to inactivity for a long time.')
 
 
 client = TicTacToeClient(intents=intents)
@@ -178,29 +179,30 @@ async def stop_command(interaction: discord.Interaction):
     if not stop_result:
         await interaction.followup.send(embed=get_nothing_cancel_embed())
     else:
-        channel_id = stop_result['channel_id']
-        message_id = stop_result['message_id']
-        channel = interaction.client.get_channel(channel_id)
-        if channel is not None:
-            try:
-                message = await channel.fetch_message(message_id)
-                if stop_result['stop_type'] in ['game', 'rematch']:
-                    game_instance = stop_result['game_instance']
-                    game_instance.stopped = True
-                    game_instance.finished = True
-                    if not game_instance.finished_layout:
-                        game_instance.finished_layout = []
-                    view = game_button_view(game_instance)
-                else:
-                    view = None
+        for i in range(len(stop_result['game_instance'].game_messages)):
+            channel_id = stop_result['channel_id'][i]
+            message_id = stop_result['message_id'][i]
+            channel = interaction.client.get_channel(channel_id)
+            if channel is not None:
+                try:
+                    message = await channel.fetch_message(message_id)
+                    if stop_result['stop_type'] in ['game', 'rematch']:
+                        game_instance = stop_result['game_instance']
+                        game_instance.stopped = True
+                        game_instance.finished = True
+                        if not game_instance.finished_layout:
+                            game_instance.finished_layout = []
+                        view = game_button_view(game_instance)
+                    else:
+                        view = None
 
-                await message.edit(
-                    embed=stop_result['decline_embed'],
-                    view=view
-                )
-            except discord.NotFound:
-                pass
-        await interaction.followup.send(embed=stop_result['stop_embed'])
+                    await message.edit(
+                        embed=stop_result['decline_embed'],
+                        view=view
+                    )
+                except discord.NotFound:
+                    pass
+            await interaction.followup.send(embed=stop_result['stop_embed'])
 
 
 @client.tree.command(name='start',

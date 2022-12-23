@@ -10,9 +10,7 @@ class GameInstance:
     playerO_name: int
     board: list
     turn: Player
-    message_id: int
-    channel_id: int
-    guild_id: int
+    game_messages: list
     last_active: int
     finished: bool = False
     finished_layout: list = None

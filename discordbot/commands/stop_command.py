@@ -86,8 +86,8 @@ def check_stop_command(user_id: int) -> dict | bool:
         return {
             'stop_type': 'request',
             'stop_embed': get_stop_embed('request'),
-            'message_id': request.message_id,
-            'channel_id': request.channel_id,
+            'message_id': [request.message_id],
+            'channel_id': [request.channel_id],
             'decline_embed': get_request_decline_embed(request)
         }
     elif has_running_game(user_id):
@@ -97,8 +97,8 @@ def check_stop_command(user_id: int) -> dict | bool:
             return {
                 'stop_type': 'game',
                 'stop_embed': get_stop_embed('game'),
-                'message_id': game_instance.message_id,
-                'channel_id': game_instance.channel_id,
+                'message_id': [game_message.message_id for game_message in game_instance.game_messages],
+                'channel_id': [game_message.channel_id for game_message in game_instance.game_messages],
                 'decline_embed': get_game_cancelled_embed(user_id, game_instance),
                 'game_instance': game_instance
             }
@@ -106,8 +106,8 @@ def check_stop_command(user_id: int) -> dict | bool:
             return {
                 'stop_type': 'rematch',
                 'stop_embed': get_stop_embed('rematch'),
-                'message_id': game_instance.message_id,
-                'channel_id': game_instance.channel_id,
+                'message_id': [game_message.message_id for game_message in game_instance.game_messages],
+                'channel_id': [game_message.channel_id for game_message in game_instance.game_messages],
                 'decline_embed': decline_rematch(game_instance, user_id),
                 'game_instance': game_instance
             }

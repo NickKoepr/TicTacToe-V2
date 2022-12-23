@@ -5,6 +5,7 @@ from utils import utils
 from request.request_manager import *
 from maingame import board
 from discordbot.game.game_instance import GameInstance
+from discordbot.game.game_message import GameMessage
 from discordbot.game.game_manager import create_board_embed, create_running_game
 from discordbot.views import game_button_view
 
@@ -116,9 +117,11 @@ class start_buttons_view(discord.ui.View):
                     playerO_name=accepted_request.inviter_name,
                     board=board.create_default_board(),
                     turn=Player.PLAYER_X,
-                    guild_id=accepted_request.guild_id,
-                    message_id=accepted_request.message_id,
-                    channel_id=accepted_request.channel_id,
+                    game_messages=[GameMessage(
+                        guild_id=accepted_request.guild_id,
+                        message_id=accepted_request.message_id,
+                        channel_id=accepted_request.channel_id
+                    )],
                     last_active=int(time.time())
                 )
                 create_running_game(game_instance)
