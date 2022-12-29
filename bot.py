@@ -245,6 +245,12 @@ async def start_command(interaction: discord.Interaction, opponent: discord.Memb
                   message.id,
                   interaction.channel_id)
 
+@client.tree.command(name='join',
+                     description='NEW! Join the lobby to play a cross server match of tic tac toe!')
+@app_commands.guild_only()
+async def start_command(interaction: discord.Interaction):
+    await interaction.response.defer(thinking=True)
+    await interaction.followup.send(content='goedemorgen')
 
 create_tables()
 

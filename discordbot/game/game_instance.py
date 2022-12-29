@@ -6,8 +6,8 @@ from maingame.player import Player
 class GameInstance:
     playerX_id: int
     playerO_id: int
-    playerX_name: int
-    playerO_name: int
+    playerX_name: str
+    playerO_name: str
     board: list
     turn: Player
     game_messages: list
