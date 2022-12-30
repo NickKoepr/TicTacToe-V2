@@ -37,8 +37,8 @@ def get_game_cancelled_embed(user_id: int, game_instance: GameInstance) -> disco
     embed = discord.Embed(
         title='TicTacToe',
         description=
-        f'{x_icon} = {game_instance.playerX_name}\n'
-        f'{o_icon} = {game_instance.playerO_name}\n\n'
+        f'**{x_icon}** = {game_instance.playerX_name}\n'
+        f'**{o_icon}** = {game_instance.playerO_name}\n\n'
         f'**__{other_player} has won!__**\n\n'
         f'*{username} cancelled the game.*',
         color=error_color

@@ -46,8 +46,8 @@ def create_board_embed(game_instance: GameInstance) -> discord.Embed:
         turn_name = game_instance.playerO_name
     embed = discord.Embed(
         title='TicTacToe',
-        description=f'{x_icon} = {game_instance.playerX_name}\n'
-                    f'{o_icon} = {game_instance.playerO_name}\n\n'
+        description=f'**{x_icon}** = {game_instance.playerX_name}\n'
+                    f'**{o_icon}** = {game_instance.playerO_name}\n\n'
                     f'*{turn_name}\'s turn*',
         color=embed_color
     )
@@ -120,8 +120,8 @@ def create_win_embed(game_instance: GameInstance, playerX_accepted, playerO_acce
 
     embed = discord.Embed(
         title='TicTacToe',
-        description=f'{x_icon} = {game_instance.playerX_name}\n'
-                    f'{o_icon} = {game_instance.playerO_name}\n\n'
+        description=f'**{x_icon}** = {game_instance.playerX_name}\n'
+                    f'**{o_icon}** = {game_instance.playerO_name}\n\n'
                     f'**__{win_message}__**\n\n'
                     f'**Rematch?**\n'
                     f'*{game_instance.playerX_name}:* {playerx_emote}\n'
@@ -198,8 +198,7 @@ def decline_rematch(game_instance: GameInstance, user_id: int) -> discord.Embed:
     winning_embed = create_win_embed(game_instance, plX, plO)
 
     description = winning_embed.description
-    # description += f'\n\n*{player_name} declined the rematch. Thanks for playing!*'
-    description += f'\n\n*🎄 {player_name} declined the rematch. Merry Christmas and a happy new year! 🎄*'
+    description += f'\n\n*{player_name} declined the rematch. Thanks for playing!*'
     winning_embed.description = description
 
     debug(f'A player declined the rematch. '
