@@ -171,12 +171,14 @@ async def stop_command(interaction: discord.Interaction):
 
     if not utils.check_permissions(interaction.channel.permissions_for(interaction.guild.me), interaction.channel):
         await interaction.followup.send(content=utils.get_invalid_perms_message(interaction.channel))
+        debug('Bot has not the required permissions')
         return
 
     # Get the stop result if a user types the stop command.
     stop_result = check_stop_command(interaction.user.id)
     if not stop_result:
         await interaction.followup.send(embed=get_nothing_cancel_embed())
+        debug('Player has nothing to cancel')
     else:
         channel_id = stop_result['channel_id']
         message_id = stop_result['message_id']
@@ -215,26 +217,32 @@ async def start_command(interaction: discord.Interaction, opponent: discord.Memb
 
     if not utils.check_permissions(interaction.channel.permissions_for(interaction.guild.me), interaction.channel):
         await interaction.followup.send(content=utils.get_invalid_perms_message(interaction.channel))
+        debug('Bot has not the required permissions')
         return
 
     if opponent.bot:
         await interaction.followup.send(embed=get_invite_bot_embed())
+        debug('Player tried to invite a Discord bot')
         return
 
     if interaction.user.id == opponent.id:
         await interaction.followup.send(embed=get_invited_self_embed())
+        debug('Player tried to invite himself')
         return
 
     if has_sent_an_invite(interaction.user.id):
         await interaction.followup.send(embed=get_already_invite_embed())
+        debug('Player has already sent a invite')
         return
 
     if has_running_game(interaction.user.id):
         await interaction.followup.send(embed=is_in_game(True))
+        debug('Player has already a running game')
         return
 
     if has_running_game(opponent.id):
         await interaction.followup.send(embed=is_in_game(False, opponent_name=opponent.name))
+        debug('Opponent has a running game')
         return
 
     message = await interaction.followup.send(embed=get_request_embed(opponent.name, interaction.user.name),
