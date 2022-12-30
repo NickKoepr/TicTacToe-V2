@@ -10,9 +10,11 @@ from database.database import get_stats, create_tables, update_stat, Stat
 from discordbot.commands.help_command import get_help_embed
 from discordbot.commands.start_command import *
 from discordbot.commands.stop_command import check_stop_command, get_nothing_cancel_embed
+from discordbot.commands.join_command import create_lobby_embed
 from discordbot.game.game_manager import has_running_game, running_games, remove_game
 from discordbot.views import game_button_view
 from request.request_manager import *
+from discordbot.crossplay.crossplay_manager import add_player, CpPlayer, start_game
 
 intents = discord.Intents.default()
 
@@ -245,12 +247,60 @@ async def start_command(interaction: discord.Interaction, opponent: discord.Memb
                   message.id,
                   interaction.channel_id)
 
+
 @client.tree.command(name='join',
                      description='NEW! Join the lobby to play a cross server match of tic tac toe!')
 @app_commands.guild_only()
-async def start_command(interaction: discord.Interaction):
+async def join_command(interaction: discord.Interaction):
     await interaction.response.defer(thinking=True)
-    await interaction.followup.send(content='goedemorgen')
+
+    if not utils.check_permissions(interaction.channel.permissions_for(interaction.guild.me), interaction.channel):
+        await interaction.followup.send(content=utils.get_invalid_perms_message(interaction.channel))
+        return
+
+    if has_sent_an_invite(interaction.user.id):
+        await interaction.followup.send(embed=get_already_invite_embed())
+        return
+
+    if has_running_game(interaction.user.id):
+        await interaction.followup.send(embed=is_in_game(True))
+        return
+
+    message = await interaction.followup.send(embed=create_lobby_embed())
+
+    player = CpPlayer(
+        name=interaction.user.name,
+        discord_id=interaction.user.id,
+        message=GameMessage(
+            guild_id=interaction.guild_id,
+            channel_id=interaction.channel_id,
+            message_id=message.id
+        ))
+
+    opponent = add_player(player)
+    if opponent:
+        opponent_message = opponent.message
+        guild = client.get_guild(opponent_message.guild_id)
+        if guild:
+            channel = guild.get_channel(opponent_message.channel_id)
+            if channel:
+                try:
+                    opponent_message = await channel.fetch_message(opponent_message.message_id)
+                    # TODO start game
+                    game_instance = start_game(
+                        opponent,
+                        player
+                    )
+                    board_embed = create_board_embed(game_instance)
+                    button_view = game_button_view(game_instance)
+                    await message.edit(embed=board_embed, view=button_view)
+                    await opponent_message.edit(embed = board_embed, view=button_view)
+                    debug('Started a new cross server game.')
+                    return
+                except discord.NotFound:
+                    pass
+            # TODO player message does not exists anymore, search another player.
+
 
 create_tables()
 

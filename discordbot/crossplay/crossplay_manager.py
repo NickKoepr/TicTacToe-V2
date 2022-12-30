@@ -23,9 +23,14 @@ def add_player(cp_player: CpPlayer):
     waiting_players.append(cp_player)
     return None
 
+
 def start_game(cp_playerX: CpPlayer, cp_playerO: CpPlayer):
-    create_running_game(
-        GameInstance(
+    """Start a new game.
+
+    :param cp_playerX: Player X
+    :param cp_playerO: Player O
+    """
+    game_instance = GameInstance(
             playerX_id=cp_playerX.discord_id,
             playerO_id=cp_playerO.discord_id,
             playerX_name=cp_playerX.name,
@@ -38,4 +43,5 @@ def start_game(cp_playerX: CpPlayer, cp_playerO: CpPlayer):
             ],
             last_active=round(time.time())
         )
-    )
+    create_running_game(game_instance)
+    return game_instance
