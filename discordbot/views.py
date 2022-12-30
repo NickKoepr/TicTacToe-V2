@@ -9,6 +9,9 @@ from utils import utils
 from maingame.board import create_default_board
 
 
+# TODO: Remember to stop the cross server games when one of the messages can't be edited (because of permissions of
+# TODO non existence channels/messages/guilds.
+
 class game_button(discord.ui.Button):
     def __init__(self, game_instance: GameInstance, button_id: int):
         emoji = None
@@ -49,26 +52,21 @@ class game_button(discord.ui.Button):
                     else:
                         embed = create_board_embed(game_instance)
 
+                    view = game_button_view(game_instance)
+
                     await interaction.message.edit(embed=embed,
-                                                   view=game_button_view(game_instance))
+                                                   view=view)
+
+                    other_message = await change_other_message(
+                        game_instance=game_instance,
+                        interaction=interaction,
+                        embed=embed,
+                        view=view
+                    )
+                    # TODO stop a game when the message is deleted.
             else:
                 await invalid_perms(game_instance, interaction)
         await interaction.response.defer()
-
-
-async def invalid_perms(game_instance: GameInstance, interaction: discord.Interaction):
-    """Stop the game and try to edit the game message if the bot has not the right permissions.
-
-    :param game_instance: game instance
-    :param interaction: interaction
-    """
-    game_instance.stopped = True
-    remove_game(game_instance.playerO_id, game_instance.playerX_id)
-    try:
-        await interaction.message.edit(content=utils.get_invalid_perms_message(
-            interaction.channel), view=None, embed=None)
-    except discord.errors.Forbidden:
-        pass
 
 
 class request_button(discord.ui.Button):
@@ -102,15 +100,41 @@ class request_button(discord.ui.Button):
                             game_instance.board = create_default_board()
                             create_running_game(game_instance)
 
-                            await interaction.message.edit(embed=create_board_embed(game_instance),
-                                                           view=game_button_view(game_instance))
+                            new_embed = create_board_embed(game_instance)
+                            view = game_button_view(game_instance)
+
+                            await interaction.message.edit(embed=new_embed,
+                                                           view=view)
+
+                            other_message = await change_other_message(
+                                game_instance=game_instance,
+                                interaction=interaction,
+                                embed=new_embed,
+                                view=view
+                            )
+                            # TODO stop the running game when the bot wasn't able to change the other message.
+
                         else:
                             await interaction.message.edit(embed=embed)
+                            other_message = await change_other_message(
+                                game_instance=game_instance,
+                                interaction=interaction,
+                                embed=embed
+                            )
+                            # TODO stop the running game when the bot wasn't able to change the other message.
                 elif self.button_type == 'Decline':
                     embed = decline_rematch(game_instance, interaction.user.id)
                     game_instance.stopped = True
+                    view = game_button_view(game_instance)
                     await interaction.message.edit(embed=embed,
-                                                   view=game_button_view(game_instance))
+                                                   view=view)
+                    other_message = await change_other_message(
+                        game_instance=game_instance,
+                        interaction=interaction,
+                        embed=embed,
+                        view=view
+                    )
+                    # TODO stop the running game when the bot wasn't able to change the other message.
             else:
                 await invalid_perms(game_instance, interaction)
         await interaction.response.defer()
@@ -125,3 +149,50 @@ class game_button_view(discord.ui.View):
         if game_instance.finished and not game_instance.stopped:
             self.add_item(request_button(game_instance, 'Accept', discord.ButtonStyle.success))
             self.add_item(request_button(game_instance, 'Decline', discord.ButtonStyle.red))
+
+
+async def invalid_perms(game_instance: GameInstance, interaction: discord.Interaction):
+    """Stop the game and try to edit the game message if the bot has not the right permissions.
+
+    :param game_instance: game instance
+    :param interaction: interaction
+    """
+    game_instance.stopped = True
+    remove_game(game_instance.playerO_id, game_instance.playerX_id)
+    try:
+        await interaction.message.edit(content=utils.get_invalid_perms_message(
+            interaction.channel), view=None, embed=None)
+    except discord.errors.Forbidden:
+        pass
+
+
+async def change_other_message(game_instance: GameInstance, interaction: discord.Interaction, embed: discord.Embed,
+                               view: discord.ui.View | bool | None = False) -> None | bool:
+    """Change a message other than the clicked message (used for games with more than one message).
+
+    :param game_instance: The game instance.
+    :param interaction: The interaction.
+    :param embed: The embed to change to.
+    :param view: The view to change to, or None for no view. Don't specify this value if you don't want to change
+    the current view.
+    :return: False when no message(s) is/are edited, None when the bot can't edit (one of) the message(s) and True if
+    the message(s) is/are changed.
+    """
+    if len(game_instance.game_messages) > 1:
+        for game_message in game_instance.game_messages:
+            if game_message.message_id != interaction.message.id:
+                message = await utils.check_for_message(
+                    client=interaction.client,
+                    guild_id=game_message.guild_id,
+                    channel_id=game_message.channel_id,
+                    message_id=game_message.message_id
+                )
+                if message is not None:
+                    if view == False:
+                        await message.edit(embed=embed)
+                        return True
+                    else:
+                        await message.edit(view=view, embed=embed)
+                        return True
+                return None
+    return False

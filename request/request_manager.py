@@ -106,18 +106,18 @@ def try_accepting_request(invited_id: int, message_id: int) -> bool | list:
     return False
 
 
-def decline_request_invited(invited_id: int, message_id: int) -> bool:
-    """Decline a request based on the inviter id.
+def decline_request_invited(invited_id: int, message_id: int = None) -> bool:
+    """Decline a request based on the invited id.
 
     :param invited_id: The user ID of the invited member.
-    :param message_id: The message ID.
+    :param message_id: The message ID or None to decline all invites.
     :return: True if the invite is cancelled, otherwise False.
     """
 
     if invited_id in invited_users.keys():
         invites = invited_users[invited_id]
         for request in invites:
-            if request.message_id == message_id and request.invited_id == invited_id:
+            if request.invited_id == invited_id and (message_id is None or request.message_id == message_id):
                 if len(invited_users[invited_id]) == 1:
                     invited_users.pop(invited_id)
                 else:

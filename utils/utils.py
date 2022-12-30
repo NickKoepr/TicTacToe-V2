@@ -71,3 +71,16 @@ def get_uptime() -> str:
     hours = (minutes // 60)
     days = hours // 24
     return f'{days} day(s), {hours % 24} hour(s), {minutes % 60} minute(s) and {seconds % 60} second(s).'
+
+
+async def check_for_message(client: discord.Client, guild_id: int, channel_id: int, message_id: int) -> None | discord.Message:
+    guild = client.get_guild(guild_id)
+    if guild:
+        channel = guild.get_channel(channel_id)
+        if channel:
+            try:
+                message = await channel.fetch_message(message_id)
+                return message
+            except discord.NotFound:
+                return None
+    return None
