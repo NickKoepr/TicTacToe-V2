@@ -20,7 +20,7 @@ synced = False
 cancel_time = 60 * 5
 
 
-class TicTacToeClient(discord.Client):
+class TicTacToeClient(discord.AutoShardedClient):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.tree = app_commands.CommandTree(self)
@@ -90,7 +90,7 @@ class TicTacToeClient(discord.Client):
                                          description='This game is cancelled due to inactivity for a long time.')
 
 
-client = TicTacToeClient(intents=intents)
+client = TicTacToeClient(intents=intents, shard_count=2)
 
 
 def console():
@@ -109,6 +109,7 @@ def console():
                 print(f'TicTacToe Discord bot stats:\n'
                       f'Bot version: {utils.bot_version}\n'
                       f'Latency: {round(client.latency * 1000)}ms\n'
+                      f'Shard count: {client.shard_count}\n'
                       f'Bot uptime: {utils.get_uptime()}\n'
                       f'Active games: {round(len(running_games) / 2)}\n'
                       f'Active requests: {len(inviter_users)}\n'
