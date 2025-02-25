@@ -1,11 +1,11 @@
-FROM python:3.10
+FROM python:3.10-alpine
 
-WORKDIR /app
+WORKDIR /tictactoe
 
 COPY . .
 
 RUN pip install -r requirements.txt
 
-ENV PYTHONPATH="/app"
+ENV PYTHONPATH="/tictactoe"
 
 ENTRYPOINT ["python3", "bot.py"]

@@ -1,6 +1,3 @@
-import asyncio
-import sqlite3
-import threading
 import os.path
 
 from discord import app_commands
@@ -91,45 +88,6 @@ class TicTacToeClient(discord.AutoShardedClient):
 
 
 client = TicTacToeClient(intents=intents, shard_count=2)
-
-
-def console():
-    connection = sqlite3.connect('tictactoe.db')
-    cursor = connection.cursor()
-    while True:
-        user_input = input().strip().lower()
-        match user_input:
-            case 'help':
-                print('TicTacToe console commands\n'
-                      'stats - Get different stats from the bot.\n'
-                      'debug - Turn the debug messages on or off.\n'
-                      'presence - Change the presence message on Discord.')
-            case 'stats':
-                stats = get_stats(cursor)
-                print(f'TicTacToe Discord bot stats:\n'
-                      f'Bot version: {utils.bot_version}\n'
-                      f'Latency: {round(client.latency * 1000)}ms\n'
-                      f'Shard count: {client.shard_count}\n'
-                      f'Bot uptime: {utils.get_uptime()}\n'
-                      f'Active games: {round(len(running_games) / 2)}\n'
-                      f'Active requests: {len(inviter_users)}\n'
-                      f'Current server count: {len(client.guilds)}\n'
-                      f'Total commands sent: {stats["total_commands"]}\n'
-                      f'- Total start commands sent: {stats["start_command"]}\n'
-                      f'- Total help commands sent: {stats["help_command"]}\n'
-                      f'- Total stop commands sent: {stats["stop_command"]}\n'
-                      f'Total games played: {stats["total_games"]}')
-            case 'debug':
-                utils.debug_enabled = False if utils.debug_enabled else True
-                print(f'The debugger is now {"on" if utils.debug_enabled else "off"}!')
-            case 'presence':
-                presence = input('Please enter a new presence: ').strip()
-                presence_text(presence)
-                asyncio.run(client.change_presence(activity=discord.Game(presence)))
-                print(f'Presence changed to \'{presence}\'!')
-            case _:
-                print('This command doesn\'t exists! Type help for list of commands.')
-
 
 def presence_text(text=None):
     if not text:
@@ -254,8 +212,6 @@ async def start_command(interaction: discord.Interaction, opponent: discord.Memb
 
 
 create_tables()
-
-threading.Thread(target=console, daemon=True).start()
 
 utils.time_started = time.time()
 
