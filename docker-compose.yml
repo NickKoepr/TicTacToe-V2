@@ -1,0 +1,11 @@
+services:
+  ttt-bot:
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: .
+    volumes:
+      - ttt_volume:/app
+
+volumes:
+  ttt_volume:
